@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="common">
+
+	<!-- 페이징 쿼리 -->
+	<sql id="pagingPre">
+    <![CDATA[
+        SELECT WRAP2.*
+         FROM (
+               SELECT COUNT(*) OVER() AS TOTAL_COUNT,
+                      WRAP1.*
+                FROM ( 
+    ]]>
+	</sql>
+
+	<sql id="pagingPost">
+    <![CDATA[
+            ) WRAP1
+        ) WRAP2
+        WHERE WRAP2.RNUM BETWEEN #{start} AND #{end}
+    ]]>
+	</sql>
+	
+	<!-- 서점 정보  -->
+	<select id="selectStore" parameterType="Map"  resultType="camelMap">
+		SELECT  STORE_ID   AS CODE,
+				STORE_NAME AS VALUE,
+				PASSWORD,
+				STORE_PHONE
+		   FROM DLOAN_STORE_TBL
+		<where>
+			<if test="storeId != null and storeId != '' and storeId != 'randomOrder'">
+			STORE_ID = #{storeId}
+			</if>
+		</where>
+				order by STORE_NAME ASC
+	</select> 
+	
+	<!-- 도서관 정보  -->
+	<select id="selectLibrary" parameterType="Map"  resultType="camelMap">
+		SELECT  LIB_MANAGE_CODE   AS CODE,
+				LIB_NAME          AS VALUE,
+				LIB_PHONE,
+				LIB_ID,
+				PASSWORD,
+				HANDPHONE,
+				LIB_SORT_ORDER AS NUM
+		FROM DLOAN_LIB_TBL
+		WHERE LIB_MANAGE_CODE IS NOT NULL
+			<if test="storeId != null and storeId != ''">
+				AND LIB_MANAGE_CODE IN (SELECT LIB_MANAGE_CODE FROM DLOAN_LIB_ORDER_CONF_TBL WHERE STORE_ID = #{storeId}) 
+			</if>
+	</select> 
+	
+	<!-- 
+		SMS 프로시져 호출
+		(I_USER_KEY IN INTEGER, 
+		 I_LOAN_KEY IN INTEGER, 
+		 I_SEND_TEL IN VARCHAR2, 
+		 I_RECV_TEL IN VARCHAR2, 
+		 I_MSG IN VARCHAR2, 
+		 I_MSG_GB IN VARCHAR2 := 'PUB', 
+		 I_MANAGE_CODE IN VARCHAR2 := 'MA', 
+		 I_SMS_TYPE IN VARCHAR2 :='', 
+		 I_SEND_WORKER IN VARCHAR2 :='', 
+		 I_FIRST_WORK IN VARCHAR2 := '', 
+		 I_USER_NAME IN VARCHAR2 := 'NULL')
+	 -->
+	<update id="smsSend" statementType="CALLABLE" parameterType="Map">
+		{ CALL SMS_TOT_SEND_PROC (
+			#{userKey},
+			0,
+			#{sender,        jdbcType=VARCHAR},
+			#{recever,       jdbcType=VARCHAR},
+			#{msg,           jdbcType=VARCHAR},
+			NULL,
+			#{libManageCode, jdbcType=VARCHAR},
+			'DLO01',
+			#{worker,        jdbcType=VARCHAR},
+			TO_CHAR(SYSDATE, 'YYYY/MM/DD HH24:MI:SS'),
+			#{userName,      jdbcType=VARCHAR}
+			)
+		}
+	</update>
+	
+	<update id="smsSend2" statementType="CALLABLE" parameterType="Map">
+		{ CALL SMS_TOT_SEND_LIB_PROC (
+			#{userKey},
+			0,
+			#{sender,        jdbcType=VARCHAR},
+			#{recever,       jdbcType=VARCHAR},
+			#{msg,           jdbcType=VARCHAR},
+			NULL,
+			#{libManageCode, jdbcType=VARCHAR},
+			'DLO01',
+			#{worker,        jdbcType=VARCHAR},
+			TO_CHAR(SYSDATE, 'YYYY/MM/DD HH24:MI:SS'),
+			#{userName,      jdbcType=VARCHAR}
+			)
+		}
+	</update>
+
+	<update id="smsSendDloan" statementType="CALLABLE" parameterType="Map">
+		{ CALL SMS_TOT_SEND_DLOAN_PROC (
+			#{userKey},
+			0,
+			#{sender,        jdbcType=VARCHAR},
+			#{recever,       jdbcType=VARCHAR},
+			#{msg,           jdbcType=VARCHAR},
+			NULL,
+			#{libManageCode, jdbcType=VARCHAR},
+			'DLO01',
+			#{worker,        jdbcType=VARCHAR},
+			TO_CHAR(SYSDATE, 'YYYY/MM/DD HH24:MI:SS'),
+			#{userName,      jdbcType=VARCHAR},
+			TO_DATE(#{sendDate,        jdbcType=VARCHAR}, 'YYYY/MM/DD HH24:MI:SS')
+			)
+		}
+	</update>
+	
+	<update id="smsSendDloan2" statementType="CALLABLE" parameterType="Map">
+		{ CALL SMS_TOT_SEND_DLOAN_PROC_TWO (
+			#{userKey},
+			0,
+			#{sender,        jdbcType=VARCHAR},
+			#{recever,       jdbcType=VARCHAR},
+			#{msg,           jdbcType=VARCHAR},
+			NULL,
+			#{libManageCode, jdbcType=VARCHAR},
+			'DLO01',
+			#{worker,        jdbcType=VARCHAR},
+			TO_CHAR(SYSDATE, 'YYYY/MM/DD HH24:MI:SS'),
+			#{userName,      jdbcType=VARCHAR},
+			TO_DATE(#{sendDate,        jdbcType=VARCHAR}, 'YYYY/MM/DD HH24:MI:SS')
+			)
+		}
+	</update>
+	
+	<!-- 상태값 변경 History -->
+	<insert id="insertRequestStatusHistory" parameterType="Map">
+		INSERT INTO DLOAN_REQ_STATUS_HIS_TBL 
+				(
+				REQ_KEY, 
+				REQ_STATUS, 
+				CHANGE_USER_TYPE, 
+				CHANGE_USER_ID, 
+				CHANGE_DATE
+				)
+		VALUES (
+				#{recKey},
+				#{reqStatus}, 
+				#{type}, 
+				#{userId}, 
+				SYSDATE
+				)
+	</insert>
+	
+	<!-- sms Content -->
+	<select id="getSmsContents" parameterType="Map"  resultType="String">
+		SELECT CONTENTS
+		  FROM DLOAN_SMS_CONF_TBL
+		 WHERE NAME    = #{name}
+		   AND AUTO_YN = #{autoYn}
+	</select>
+</mapper>

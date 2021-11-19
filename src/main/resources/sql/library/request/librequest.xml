@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lib.request">
+	
+	<select id="selectLibRequestInfo" parameterType="Map" resultType="camelMap">
+		<include refid="common.pagingPre" />
+		SELECT
+			ROW_NUMBER() OVER (ORDER BY 
+			<choose>
+				<when test='sortCol == "STORE_ID" and order =="ASC"'>
+					STORE_ID ASC
+				</when>
+				<when test='sortCol == "STORE_ID" and order =="DESC"'>
+					STORE_ID DESC
+				</when>
+				<when test='sortCol == "STORE_NAME" and order =="ASC"'>
+					STORE_NAME ASC
+				</when>
+				<when test='sortCol == "STORE_NAME" and order =="DESC"'>
+					STORE_NAME DESC
+				</when>
+				<when test='sortCol == "TITLE" and order =="ASC"'>
+					TITLE ASC
+				</when>
+				<when test='sortCol == "TITLE" and order =="DESC"'>
+					TITLE DESC
+				</when>
+				<when test='sortCol == "AUTHOR" and order =="ASC"'>
+					AUTHOR ASC
+				</when>
+				<when test='sortCol == "AUTHOR" and order =="DESC"'>
+					AUTHOR DESC
+				</when>
+				<when test='sortCol == "PUBLISHER" and order =="ASC"'>
+					PUBLISHER ASC
+				</when>
+				<when test='sortCol == "PUBLISHER" and order =="DESC"'>
+					PUBLISHER DESC
+				</when>
+				<when test='sortCol == "REQ_DATE" and order =="ASC"'>
+					REQ_DATE ASC
+				</when>
+				<when test='sortCol == "REQ_DATE" and order =="DESC"'>
+					REQ_DATE DESC
+				</when>
+				<when test='sortCol == "LOAN_WAIT_DATE" and order =="ASC"'>
+					LOAN_WAIT_DATE ASC
+				</when>
+				<when test='sortCol == "LOAN_WAIT_DATE" and order =="DESC"'>
+					LOAN_WAIT_DATE DESC
+				</when>
+				<when test='sortCol == "LOAN_DATE" and order =="ASC"'>
+					LOAN_DATE ASC
+				</when>
+				<when test='sortCol == "LOAN_DATE" and order =="DESC"'>
+					LOAN_DATE DESC
+				</when>
+				<when test='sortCol == "RETURN_DATE" and order =="ASC"'>
+					RETURN_DATE ASC
+				</when>
+				<when test='sortCol == "RETURN_DATE" and order =="DESC"'>
+					RETURN_DATE DESC
+				</when>
+				<when test='sortCol == "RETURN_PLAN_DATE" and order =="ASC"'>
+					RETURN_PLAN_DATE ASC
+				</when>
+				<when test='sortCol == "RETURN_PLAN_DATE" and order =="DESC"'>
+					RETURN_PLAN_DATE DESC
+				</when>
+				<when test='sortCol == "CANCEL_REASON" and order =="ASC"'>
+					CANCEL_REASON ASC
+				</when>
+				<when test='sortCol == "CANCEL_REASON" and order =="DESC"'>
+					CANCEL_REASON DESC
+				</when>
+				<when test='sortCol == "REQ_STATUS_NAME" and order =="ASC"'>
+					REQ_STATUS_NAME ASC
+				</when>
+				<when test='sortCol == "REQ_STATUS_NAME" and order =="DESC"'>
+					REQ_STATUS_NAME DESC
+				</when>
+				<when test='sortCol == "RES_STATUS_NAME" and order =="ASC"'>
+					RES_STATUS_NAME ASC
+				</when>
+				<when test='sortCol == "RES_STATUS_NAME" and order =="DESC"'>
+					RES_STATUS_NAME DESC
+				</when>
+				<when test='sortCol == "SMS_YN" and order =="ASC"'>
+					SMS_YN ASC
+				</when>
+				<when test='sortCol == "SMS_YN" and order =="DESC"'>
+					SMS_YN DESC
+				</when>
+				<when test='sortCol == "LIB_MANAGE_NAME" and order =="ASC"'>
+					LIB_MANAGE_NAME ASC
+				</when>
+				<when test='sortCol == "LIB_MANAGE_NAME" and order =="DESC"'>
+					LIB_MANAGE_NAME DESC
+				</when>
+				<when test='sortCol == "USER_NO" and order =="ASC"'>
+					USER_NO ASC
+				</when>
+				<when test='sortCol == "USER_NO" and order =="DESC"'>
+					USER_NO DESC
+				</when>
+				<when test='sortCol == "CONFIRM_MESSAGE" and order =="ASC"'>
+					CONFIRM_MESSAGE ASC
+				</when>
+				<when test='sortCol == "CONFIRM_MESSAGE" and order =="DESC"'>
+					CONFIRM_MESSAGE DESC
+				</when>
+				<otherwise>
+					REQ_DATE DESC
+				</otherwise>
+			</choose>
+			) RNUM,
+			REC_KEY,
+			USER_NO,
+			(SELECT NAME FROM CO_LOAN_USER_TBL LOAN WHERE LOAN.USER_NO = MAIN.USER_NO) USER_NAME,
+			SMS_YN,
+			STORE_ID,
+			STORE_NAME,
+			LIB_MANAGE_CODE,
+			LIB_MANAGE_NAME,
+			ISBN,
+			TITLE,
+			IMG_URL,
+			AUTHOR,
+			PUBLISHER,
+			PUB_DATE,
+			PRICE,
+			REQ_DATE,
+			REQ_STATUS,
+			REQ_STATUS_NAME,
+			LOAN_WAIT_DATE,
+			LOAN_DATE,
+			RETURN_DATE,
+			(SELECT L.RETURN_PLAN_DATE FROM LH_STORAGE_V01 L WHERE L.REC_KEY=MAIN.LOAN_KEY) as RETURN_PLAN_DATE,
+			CANCEL_REASON,
+			RES_KEY,
+			RES_STATUS,
+			RES_STATUS_NAME,
+			CONFIRM_MESSAGE
+		FROM
+			(SELECT
+				REQ.*,
+				(SELECT LIB_NAME FROM DLOAN_LIB_TBL A WHERE A.LIB_MANAGE_CODE = REQ.LIB_MANAGE_CODE) LIB_MANAGE_NAME,
+				(SELECT STORE_NAME FROM DLOAN_STORE_TBL S WHERE S.STORE_ID = REQ.STORE_ID) STORE_NAME,
+				CASE REQ_STATUS
+					WHEN 'U01' THEN '신청중'
+					WHEN 'U02' THEN '신청취소'
+					WHEN 'S02' THEN '서점신청거절'
+					WHEN 'S03' THEN '도서관확인요청'
+					WHEN 'S04' THEN '도서준비'
+					WHEN 'S05' THEN '대출대기'
+					WHEN 'S06' THEN '대출'
+					WHEN 'S07' THEN '반납'
+					WHEN 'S08' THEN '미대출취소'
+					WHEN 'S09' THEN '환불불가'
+					WHEN 'L01' THEN '도서관승인'
+					WHEN 'L02' THEN '도서관신청거절'
+					ELSE ''
+				END REQ_STATUS_NAME,
+				CASE RES_STATUS
+					WHEN 'S01' THEN '납품요청'
+					WHEN 'S02' THEN '납품완료'
+					WHEN 'L01' THEN '납품승인'
+					ELSE ''
+				END RES_STATUS_NAME
+			FROM DLOAN_REQ_TBL REQ) MAIN
+		<where>
+			<if test="reqStatus != null and reqStatus != ''">
+				REQ_STATUS = #{reqStatus}
+			</if>
+			<if test="reqLibManageCode != null and reqLibManageCode != ''">
+				AND LIB_MANAGE_CODE = #{reqLibManageCode}
+			</if>
+			<if test="reqStoreId != null and reqStoreId != ''">
+				AND STORE_ID = #{reqStoreId}
+			</if>
+			<if test="from_reqDate != null and from_reqDate != ''">
+				<if test="to_reqDate != null and to_reqDate != ''">
+					AND REQ_DATE BETWEEN TO_DATE (REPLACE(#{from_reqDate}, '-', '') || '000000', 'YYYYMMDDHH24MISS')
+					AND TO_DATE (REPLACE(#{to_reqDate}, '-', '') || '235959', 'YYYYMMDDHH24MISS')
+				</if>
+			</if>
+			<if test="userNo != null and userNo != ''">
+				AND USER_NO =  #{userNo}
+			</if>
+			<if test="title != null and title != ''">
+				<!-- 2019 간담회 개선 : LIKE 검색 기능 수정 -->
+				AND TITLE LIKE '%' || #{title} || '%'
+			</if>
+			<if test="author != null and author != ''">
+				<!-- 2019 간담회 개선 : LIKE 검색 기능 수정 -->
+				AND AUTHOR LIKE '%' || #{author} || '%'
+			</if>
+			<if test="publisher != null and publisher != ''">
+				<!-- 2019 간담회 개선 : LIKE 검색 기능 수정 -->
+				AND PUBLISHER LIKE '%' || #{publisher} || '%'
+			</if>
+		</where>
+		<include refid="common.pagingPost" />
+	</select>
+	
+	<!-- 도서관승인   -->
+	<update id="updateLibReqStatus" parameterType="Map">
+		UPDATE
+			DLOAN_REQ_TBL
+		SET
+			REQ_STATUS = #{reqStatus}
+			<if test="reqStatus == 'L01'">
+				, LIB_CONFIRM_DATE = NVL(LIB_CONFIRM_DATE, SYSDATE)
+			</if>
+			<if test="reqStatus == 'S03'">
+				, LIB_CONFIRM_DATE = null
+				, CANCEL_REASON = null
+				, CANCEL_USER_ID = null
+				, CANCEL_DATE = null
+			</if>
+		WHERE
+			REC_KEY = #{recKey}
+	</update>
+	
+	<update id="updateCancelReasonNStatus" parameterType="Map">
+		UPDATE
+			DLOAN_REQ_TBL
+		SET
+			REQ_STATUS    = #{reqStatus},
+			CANCEL_REASON = #{cancelReason},
+			CANCEL_USER_ID = #{userId},
+			CANCEL_DATE = sysdate
+		WHERE REC_KEY = #{recKey}
+	</update>
+	
+	<select id="selectRequestInfo" parameterType="Map" resultType="camelMap">
+	SELECT ISBN
+	     , TITLE
+	     , AUTHOR
+	     , PUBLISHER
+	     , CANCEL_REASON
+	  FROM DLOAN_REQ_TBL
+	 WHERE REQ_STATUS IN ('S02', 'L02')
+	   AND REC_KEY IN
+	 	<foreach collection="arRecKey" item="item" index="index" separator="," open="(" close=")">
+	 	#{item}
+	 	</foreach> 
+	</select>
+	
+	<select id="selectLibInfo" parameterType="Map" resultType="camelMap">
+	SELECT *
+	  FROM DLOAN_LIB_TBL
+	 WHERE LIB_MANAGE_CODE = #{libManageCode}
+	</select>
+	
+	<update id="updateBookInfo" parameterType="Map">
+		update bo_book_tbl set manage_code=#{changeLib} where SPECIES_KEY=(SELECT PURCHASE_KEY FROM DLOAN_REQ_TBL WHERE REC_KEY=#{recKey})
+	</update>
+	
+	<update id="updateIdxInfo" parameterType="Map">
+		update idx_bo_tbl set manage_code=#{changeLib} where REC_KEY=(SELECT PURCHASE_KEY FROM DLOAN_REQ_TBL WHERE REC_KEY=#{recKey})
+	</update>
+	
+	<update id="updatePurchaseInfo" parameterType="Map">
+		update bo_purchaseinfo_tbl set manage_code=#{changeLib} where SPECIES_KEY=(SELECT PURCHASE_KEY FROM DLOAN_REQ_TBL WHERE REC_KEY=#{recKey})
+	</update>
+	
+	<update id="updateSpeicesInfo" parameterType="Map">
+		update BO_SPECIES_TBL set manage_code=#{changeLib} where REC_KEY=(SELECT PURCHASE_KEY FROM DLOAN_REQ_TBL WHERE REC_KEY=#{recKey})
+	</update>
+	
+	<update id="updateDBBookInfo" parameterType="Map">
+		update co_non_db_book_tbl set manage_code=#{changeLib} where REC_KEY=(SELECT BOOK_KEY FROM DLOAN_REQ_TBL WHERE REC_KEY=#{recKey})
+	</update>
+	
+	<update id="updateLSInfo" parameterType="Map">
+		update LS_WORK_T01 set manage_code=#{changeLib}, book_manage_code=#{changeLib} where BOOK_KEY=(SELECT BOOK_KEY FROM DLOAN_REQ_TBL WHERE REC_KEY=#{recKey})
+	</update>
+	
+	<update id="updateCLInfo" parameterType="Map">
+		update CO_LOAN_TBL set manage_code=#{changeLib}, book_manage_code=#{changeLib} where BOOK_KEY=(SELECT BOOK_KEY FROM DLOAN_REQ_TBL WHERE REC_KEY=#{recKey})
+	</update>
+	
+	<select id="selectLSCnt" parameterType="Map" resultType="Integer">
+		SELECT COUNT(*) AS CNT FROM LS_WORK_T01 WHERE BOOK_KEY=(SELECT BOOK_KEY FROM DLOAN_REQ_TBL WHERE REC_KEY=#{recKey})
+	</select>
+
+</mapper>

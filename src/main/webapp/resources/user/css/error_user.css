@@ -1,0 +1,24 @@
+﻿
+.error_page{width: 100%;height:auto;}
+.error_msg{
+	margin-top:250px;text-align: center;
+	font-family: "맑은 고딕", Malgun Gothic, "돋움", Dotum, "굴림", Gulim, Tahoma, Verdana, AppleGothic, UnDotum, sans-serif;
+}
+.error_msg>img{}
+.error_msg>h1{ font-size: 28px; font-weight: bold;line-height:80px;color: rgb(160,160,160)}
+
+
+input.btn_prev{
+  margin-top:10px;margin-right: 20px;
+	width: 160px; height:40px;line-height: 40px;
+	color:#ffffff;background:rgb(160,160,160);
+  font-size: 18px; font-weight: bold;
+}
+input.btn_prev:active{background:rgb(140,140,140);}
+input.btn_home{
+  margin-top:10px;
+	width: 160px; height:40px;line-height: 40px;
+	color:#ffffff;background:#f57878;
+  font-size: 18px; font-weight: bold;
+}
+input.btn_home:active{background: #db5858}

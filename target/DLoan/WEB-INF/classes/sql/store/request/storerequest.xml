@@ -1,0 +1,501 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="store.request">
+	
+	<select id="selectStoreRequestInfo" parameterType="Map" resultType="camelMap">
+		<include refid="common.pagingPre" />
+		SELECT
+			ROW_NUMBER() OVER (ORDER BY 
+				<choose>
+					<when test='sortCol == "STORE_ID" and order =="ASC"'>
+						STORE_ID ASC
+					</when>
+					<when test='sortCol == "STORE_ID" and order =="DESC"'>
+						STORE_ID ASC
+					</when>
+					<when test='sortCol == "TITLE" and order =="ASC"'>
+						TITLE ASC
+					</when>
+					<when test='sortCol == "TITLE" and order =="DESC"'>
+						TITLE DESC
+					</when>
+					<when test='sortCol == "AUTHOR" and order =="ASC"'>
+						AUTHOR ASC
+					</when>
+					<when test='sortCol == "AUTHOR" and order =="DESC"'>
+						AUTHOR DESC
+					</when>
+					<when test='sortCol == "PUBLISHER" and order =="ASC"'>
+						PUBLISHER ASC
+					</when>
+					<when test='sortCol == "PUBLISHER" and order =="DESC"'>
+						PUBLISHER DESC
+					</when>
+					<when test='sortCol == "REQ_DATE" and order =="ASC"'>
+						REQ_DATE ASC
+					</when>
+					<when test='sortCol == "REQ_DATE" and order =="DESC"'>
+						REQ_DATE DESC
+					</when>
+					<when test='sortCol == "LOAN_WAIT_DATE" and order =="ASC"'>
+						LOAN_WAIT_DATE ASC
+					</when>
+					<when test='sortCol == "LOAN_WAIT_DATE" and order =="DESC"'>
+						LOAN_WAIT_DATE DESC
+					</when>
+					<when test='sortCol == "LOAN_DATE" and order =="ASC"'>
+						LOAN_DATE ASC
+					</when>
+					<when test='sortCol == "LOAN_DATE" and order =="DESC"'>
+						LOAN_DATE DESC
+					</when>
+					<when test='sortCol == "RETURN_DATE" and order =="ASC"'>
+						RETURN_DATE ASC
+					</when>
+					<when test='sortCol == "RETURN_DATE" and order =="DESC"'>
+						RETURN_DATE DESC
+					</when>
+					<when test='sortCol == "RETURN_PLAN_DATE" and order =="ASC"'>
+						RETURN_PLAN_DATE ASC
+					</when>
+					<when test='sortCol == "RETURN_PLAN_DATE" and order =="DESC"'>
+						RETURN_PLAN_DATE DESC
+					</when>
+					<when test='sortCol == "CANCEL_REASON" and order =="ASC"'>
+						CANCEL_REASON ASC
+					</when>
+					<when test='sortCol == "CANCEL_REASON" and order =="DESC"'>
+						CANCEL_REASON DESC
+					</when>
+					<when test='sortCol == "REQ_STATUS_NAME" and order =="ASC"'>
+						REQ_STATUS_NAME ASC
+					</when>
+					<when test='sortCol == "REQ_STATUS_NAME" and order =="DESC"'>
+						REQ_STATUS_NAME DESC
+					</when>
+					<when test='sortCol == "SMS_YN" and order =="ASC"'>
+						SMS_YN ASC
+					</when>
+					<when test='sortCol == "SMS_YN" and order =="DESC"'>
+						SMS_YN DESC
+					</when>
+					<when test='sortCol == "LIB_MANAGE_NAME" and order =="ASC"'>
+						LIB_MANAGE_NAME ASC
+					</when>
+					<when test='sortCol == "LIB_MANAGE_NAME" and order =="DESC"'>
+						LIB_MANAGE_NAME DESC
+					</when>
+					<when test='sortCol == "USER_NO" and order =="ASC"'>
+						USER_NO ASC
+					</when>
+					<when test='sortCol == "USER_NO" and order =="DESC"'>
+						USER_NO DESC
+					</when>
+					<when test='sortCol == "PRICE" and order =="ASC"'>
+						PRICE ASC
+					</when>
+					<when test='sortCol == "PRICE" and order =="DESC"'>
+						PRICE DESC
+					</when>
+					<when test='sortCol == "CONFIRM_MESSAGE" and order =="ASC"'>
+						CONFIRM_MESSAGE ASC
+					</when>
+					<when test='sortCol == "CONFIRM_MESSAGE" and order =="DESC"'>
+						CONFIRM_MESSAGE DESC
+					</when>
+					<otherwise>
+						REQ_DATE DESC
+					</otherwise>
+				</choose>
+				) RNUM,
+				REC_KEY,
+				USER_NO,
+				(SELECT NAME FROM CO_LOAN_USER_TBL LOAN WHERE LOAN.USER_NO = MAIN.USER_NO) USER_NAME,
+				SMS_YN,
+				STORE_ID,
+				LIB_MANAGE_CODE,
+				LIB_MANAGE_NAME,
+				ISBN,
+				TITLE,
+				IMG_URL,
+				AUTHOR,
+				PUBLISHER,
+				PUB_DATE,
+				PRICE,
+				REQ_DATE,
+				REQ_STATUS,
+				REQ_STATUS_NAME,
+				LOAN_WAIT_DATE,
+				LOAN_DATE,
+				RETURN_DATE,
+				(SELECT L.RETURN_PLAN_DATE FROM LH_STORAGE_V01 L WHERE L.REC_KEY=MAIN.LOAN_KEY) as RETURN_PLAN_DATE,
+				CANCEL_REASON,
+				RES_KEY,
+				RES_STATUS,
+				CONFIRM_MESSAGE
+		FROM
+			(SELECT
+				REQ.*,
+				(SELECT LIB_NAME FROM DLOAN_LIB_TBL A WHERE A.LIB_MANAGE_CODE = REQ.LIB_MANAGE_CODE) LIB_MANAGE_NAME,
+				CASE REQ_STATUS
+					WHEN 'U01' THEN '신청중'
+					WHEN 'U02' THEN '신청취소'
+					WHEN 'S02' THEN '서점신청거절'
+					WHEN 'S03' THEN '도서관확인요청'
+					WHEN 'S04' THEN '도서준비'
+					WHEN 'S05' THEN '대출대기'
+					WHEN 'S06' THEN '대출'
+					WHEN 'S07' THEN '반납'
+					WHEN 'S08' THEN '미대출취소'
+					WHEN 'S09' THEN '환불불가'
+					WHEN 'L01' THEN '도서관승인'
+					WHEN 'L02' THEN '도서관신청거절'
+					ELSE ''
+				END REQ_STATUS_NAME
+			FROM DLOAN_REQ_TBL REQ) MAIN
+		WHERE 
+			STORE_ID = #{storeId}
+			<if test="reqStatus != null and reqStatus != ''">
+				AND REQ_STATUS = #{reqStatus}
+			</if>
+			<if test="from_reqDate != null and from_reqDate != ''">
+				<if test="to_reqDate != null and to_reqDate != ''">
+					AND REQ_DATE BETWEEN TO_DATE (REPLACE(#{from_reqDate}, '-', '') || '000000', 'YYYYMMDDHH24MISS')
+					AND TO_DATE (REPLACE(#{to_reqDate}, '-', '') || '235959', 'YYYYMMDDHH24MISS')
+				</if>
+			</if>
+			<if test='userNo != null and userNo != ""'>
+				AND USER_NO = #{userNo}
+			</if>
+			<if test='title != null and title != ""'>
+				<!-- 2019 간담회 개선 : LIKE 검색 기능 수정 -->
+				AND TITLE LIKE '%' || #{title} || '%'
+			</if>
+			<if test='author != null and author != ""'>
+				<!-- 2019 간담회 개선 : LIKE 검색 기능 수정 -->
+				AND AUTHOR LIKE '%' || #{author} || '%'
+			</if>
+			<if test='publisher != null and publisher != ""'>
+				<!-- 2019 간담회 개선 : LIKE 검색 기능 수정 -->
+				AND PUBLISHER LIKE '%' || #{publisher} || '%'
+			</if>
+			<if test='isbn != null and isbn !=""'>
+				<!-- 2019 간담회 개선 : ISBN 검색 추가 -->
+				AND ISBN LIKE '%' || #{isbn} || '%'
+			</if>
+		<include refid="common.pagingPost" />
+	</select>
+	
+	<!--    -->
+	<update id="updateStoreReqStatus"  parameterType="Map" >
+		UPDATE DLOAN_REQ_TBL
+		SET
+			REQ_STATUS = #{reqStatus}
+			<choose>
+				<when test='type == "ST02"'>
+					, LIB_CONFIRM_DATE = NULL
+					, CONFIRM_MESSAGE = #{confirmMessage}
+				</when>
+				<when test='type == "ST03"'>
+					<if test="enterPlanDate != null and enterPlanDate != ''">
+						, ENTER_PLAN_DATE = TO_DATE(TO_CHAR(SYSDATE+#{enterPlanDate}, 'YYYYMMDD'), 'YYYYMMDD')
+					</if>
+				</when>
+				<when test='type == "ST04"'>
+					, LOAN_WAIT_DATE = (TO_DATE(TO_CHAR(SYSDATE+7, 'YYYY/MM/DD')||' 23:59:59', 'YYYY/MM/DD HH24:MI:SS'))
+					, PURCHASE_KEY   = #{specieskKey}
+				</when>
+			</choose>
+		WHERE REC_KEY = #{recKey}
+	</update>
+	
+	<select id="selectStoreRequest" parameterType="String" resultType="camelMap">
+		SELECT
+			REQ.*
+			, SUBSTR(ISBN, INSTR(ISBN, ' ', 1, 1) + 1) SUB_ISBN
+			, SUBSTR(PUB_DATE, 0, 4) PUB_YEAR
+			, (SELECT STORE_NAME FROM DLOAN_STORE_TBL A WHERE A.STORE_ID = REQ.STORE_ID) STORE_NAME
+			, (SELECT HANDPHONE FROM DLOAN_STORE_TBL A WHERE A.STORE_ID = REQ.STORE_ID) STORE_HANDPHONE
+			, (SELECT STORE_PHONE FROM DLOAN_STORE_TBL A WHERE A.STORE_ID = REQ.STORE_ID) STORE_PHONE
+			, (SELECT LIB_NAME FROM DLOAN_LIB_TBL A WHERE A.LIB_MANAGE_CODE = REQ.LIB_MANAGE_CODE) LIB_MANAGE_NAME
+			, (SELECT HANDPHONE FROM DLOAN_LIB_TBL A WHERE A.LIB_MANAGE_CODE = REQ.LIB_MANAGE_CODE) LIB_HANDPHONE
+			, (SELECT LIB_PHONE FROM DLOAN_LIB_TBL A WHERE A.LIB_MANAGE_CODE = REQ.LIB_MANAGE_CODE) LIB_PHONE
+			, TO_CHAR (LOAN_WAIT_DATE, 'YYYY-MM-DD') LOAN_WAIT_DT
+			, TO_CHAR (RETURN_PLAN_DATE, 'YYYY-MM-DD') RETURN_PLAN_DT
+			, TO_CHAR (ENTER_PLAN_DATE, 'YYYY-MM-DD') ENTER_PLAN_DT
+		FROM DLOAN_REQ_TBL REQ
+		WHERE REC_KEY = #{recKey} 
+	</select>
+	
+	<select id="getStoreReqUserInfo" parameterType="String" resultType="camelMap">
+		SELECT REC_KEY,
+		       NAME,
+		       HANDPHONE,
+		       USER_POSITION_CODE,
+		       USER_CLASS_CODE,
+		       MEMBER_CLASS
+		  FROM CO_LOAN_USER_TBL 
+		 WHERE USER_NO = #{userNo} 
+	</select>
+	
+	<update id="updateCancelReasonNStatus" parameterType="Map">
+		UPDATE
+			DLOAN_REQ_TBL
+		SET
+			REQ_STATUS = #{reqStatus},
+			CANCEL_REASON = #{cancelReason},
+			CANCEL_USER_ID = #{userId},
+			CANCEL_DATE = sysdate
+		WHERE REC_KEY = #{recKey}
+	</update>
+	
+	<select id="getYear" resultType="String">
+		SELECT TO_CHAR(SYSDATE, 'YYYY') YEAR FROM DUAL
+	</select>
+	
+	<select id="getSeqCount" parameterType="Map" resultType="Integer">
+		SELECT COUNT(1) AS CNT 
+		  FROM BO_PURCHASE_SEQ_NO_TBL  
+		 WHERE ACQ_YEAR = #{year}
+		   AND SEQ_NO = '1000' 
+		   AND MANAGE_CODE = #{libManageCode}
+	</select>
+	
+	<insert id="insertPurchaseSeq" parameterType="map">
+		INSERT INTO BO_PURCHASE_SEQ_NO_TBL 
+				   (REC_KEY, 
+				    ACQ_YEAR, 
+				    SEQ_NO, 
+				    WORK_NO_USE_YN, 
+				    LAST_WORK_NO,
+				    SEQ_NO_CREATE_DATE, 
+				    SEQ_NO_CREATE_WORKER, 
+				    COPY_CHECK_YN, 
+				    DUP_CHECK_YN, 
+				    REVIEW_CHECK_YN,
+				    WORKING_STATUS, 
+				    FIRST_WORK, 
+				    LAST_WORK, 
+				    MANAGE_CODE) 
+			VALUES (ESL_SEQ.NEXTVAL,
+					#{year},
+					1000,
+					'N',
+					1,
+					SYSDATE,
+					'바로대출',
+					'N',
+					'N',
+					'N',
+					'0',
+					TO_CHAR(SYSDATE, 'YYYYMMDD HH24MI')||' '||#{libManageCode}||'@'||#{ipAddr}||' 바로대출',
+					TO_CHAR(SYSDATE, 'YYYYMMDD HH24MI')||' '||#{libManageCode}||'@'||#{ipAddr}||' 바로대출',
+					#{libManageCode})
+	</insert>
+	
+	<insert id="insertSpeciesInfo" parameterType="map">
+		<!-- <selectKey keyProperty="specieskKey" resultType="int" order="BEFORE"> -->
+		<selectKey keyProperty="specieskKey" resultType="long" order="BEFORE">
+			SELECT ESL_SEQ.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO BO_SPECIES_TBL 
+				   (ACQ_YEAR, 
+					FIRST_WORK, 
+					INPUT_DATE, 
+					LAST_WORK, 
+					LOC_FLAG,
+					MANAGE_CODE, 
+					REC_KEY, 
+					REMARK, 
+					SHELF_LOC_CODE, 
+					TOC_COMMON_KEY,
+					FORM_CODE) 
+			VALUES (#{year},
+					TO_CHAR(SYSDATE, 'YYYYMMDD HH24MI')||' '||#{libManageCode}||'@'||#{ipAddr}||' 바로대출',
+					SYSDATE,
+					TO_CHAR(SYSDATE, 'YYYYMMDD HH24MI')||' '||#{libManageCode}||'@'||#{ipAddr}||' 바로대출',
+					'1',
+					#{libManageCode},
+					#{specieskKey},
+					#{storeName},
+					(SELECT CODE FROM CD_CODE_TBL WHERE CLASS = '19' AND DESCRIPTION = #{storeName}),
+					-1,
+					'BK')
+	</insert>
+	
+	<insert id="insertBookInfo" parameterType="map">
+		INSERT INTO BO_BOOK_TBL 
+				   (ACQ_KEY, 
+					ACQ_YEAR, 
+					AUTHOR, 
+					BOOK_APPENDIX_FLAG, 
+					DELIVERY_YN,
+					EA_ISBN, 
+					FIRST_WORK, 
+					INPUT_DATE, 
+					LABEL_TYPE, 
+					LAST_WORK,
+					MANAGE_CODE, 
+					PRICE, 
+					PUBLISH_YEAR, 
+					REC_KEY, 
+					REPRESENT_BOOK_YN,
+					SEQ_NO, 
+					SERIAL_NO, 
+					SHELF_LOC_CODE, 
+					SPECIES_KEY, 
+					WORKING_STATUS,
+					ACQ_CODE) 
+			VALUES (#{specieskKey},
+					#{year},
+					#{author},
+					'B',
+					'Y',
+					#{subIsbn},
+					TO_CHAR(SYSDATE, 'YYYYMMDD HH24MI')||' '||#{libManageCode}||'@'||#{ipAddr}||' 바로대출',
+					SYSDATE,
+					'1',
+					TO_CHAR(SYSDATE, 'YYYYMMDD HH24MI')||' '||#{libManageCode}||'@'||#{ipAddr}||' 바로대출',
+					#{libManageCode},
+					#{price, jdbcType=VARCHAR},
+					#{pubYear},
+					#{specieskKey},
+					'Y',
+					0,
+					0,
+					(SELECT CODE FROM CD_CODE_TBL WHERE CLASS = '19' AND DESCRIPTION = #{storeName}),
+					#{specieskKey},
+					'BOA111N',
+					'1')
+	</insert>
+	
+	
+	<insert id="insertIndexInfo" parameterType="map">
+		INSERT INTO IDX_BO_TBL 
+				   (WORKING_STATUS, 
+					LAST_WORK, 
+					FIRST_WORK, 
+					AUTHOR, 
+					AUTHOR_INFO,
+					FORM_CODE, 
+					IDX_ALL_ITEM, 
+					IDX_AUTHOR, 
+					IDX_IPUBLISHER, 
+					IDX_IPUB_YEAR,
+					IDX_ITITLE, 
+					IDX_PUBLISHER, 
+					IDX_TITLE, 
+					MANAGE_CODE, 
+					PUBLISHER,
+					PUB_INFO, 
+					PUB_YEAR, 
+					PUB_YEAR_INFO, 
+					REC_KEY, 
+					SPECIES_CLASS,
+					ST_CODE, 
+					TITLE, 
+					TITLE_INFO) 
+			VALUES ('BOA111N',<!-- 'BOT112O', -->
+					TO_CHAR(SYSDATE, 'YYYYMMDD HH24MI')||' '||#{libManageCode}||'@'||#{ipAddr}||' 바로대출',
+					TO_CHAR(SYSDATE, 'YYYYMMDD HH24MI')||' '||#{libManageCode}||'@'||#{ipAddr}||' 바로대출',
+					#{author},
+					#{author},
+					'BK',
+					#{idxAll},
+					#{idxAuthor},
+					#{idxPublisher},
+					#{pubYear},
+					#{idxTitle},
+					#{idxPublisher},
+					#{idxTitle},
+					#{libManageCode},
+					#{publisher},
+					#{publisher},
+					#{pubYear},
+					#{pubYear},
+					#{specieskKey},
+					'0',
+					#{isbn},
+					#{title},
+					#{title})
+	</insert>
+	
+	<insert id="insertPurchaseInfo" parameterType="map">
+		INSERT INTO BO_PURCHASEINFO_TBL 
+				   (CHECKIN_DATE, 
+					CURRENCY_CODE, 
+					DELIVERY_BOOK_CNT, 
+					DELIVERY_PRICE, 
+					EXCHANGE_RATE,
+					FIRST_WORK, 
+					INPUT_DATE, 
+					INPUT_TYPE, 
+					LAST_WORK, 
+					MISSING_BOOK_CNT,
+					ORDER_BOOK_CNT, 
+					ORDER_DISCOUNT_TYPE, 
+					ORDER_PRICE, 
+					ORDER_SEQ_NO, 
+					ORDER_SERIAL_NO,
+					ORDER_WORK_NO, 
+					ORDER_YEAR, 
+					PRICE, 
+					PRICE_DISCOUNT_RATE, 
+					REC_KEY,
+					REMARK, 
+					SPECIES_KEY, 
+					TOTAL_VOL_CNT, 
+					MANAGE_CODE) 
+			VALUES (SYSDATE,
+					'\',
+					1,
+					#{price, jdbcType=VARCHAR},
+					1,
+					TO_CHAR(SYSDATE, 'YYYYMMDD HH24MI')||' '||#{libManageCode}||'@'||#{ipAddr}||' 바로대출',
+					SYSDATE,
+					'0',
+					TO_CHAR(SYSDATE, 'YYYYMMDD HH24MI')||' '||#{libManageCode}||'@'||#{ipAddr}||' 바로대출',
+					0,
+					1,
+					'종가격',
+					#{price, jdbcType=VARCHAR},
+					1000,
+					1,
+					1,
+					#{year},
+					#{price, jdbcType=VARCHAR},
+					0,
+					#{specieskKey},
+					'바로대출도서',
+					#{specieskKey},
+					1,
+					#{libManageCode})
+	</insert>
+	
+	<select id="getAutoLimitYn" resultType="String">
+		SELECT NVL(CONF_VALUE, 'N') FROM DLOAN_CONF_TBL WHERE CONF_ID='AUTO_LIMIT'
+	</select>
+	
+	
+	<update id="updatePrevReqStatus"  parameterType="Map" >
+		UPDATE DLOAN_REQ_TBL
+		SET
+			REQ_STATUS = #{reqStatus}
+			<choose>
+				<when test='type == "S04"'>
+					, ENTER_PLAN_DATE = null
+				</when>
+			</choose>
+		WHERE REC_KEY = #{recKey}
+	</update>
+	
+	<select id="selectNowStatus" parameterType="String" resultType="camelMap">
+		SELECT
+			REQ_STATUS
+		FROM DLOAN_REQ_TBL
+		WHERE REC_KEY IN 
+		<foreach collection="ltRecKey" item="item" index="index" separator="," open="(" close=")">
+	 		#{item}
+	 	</foreach> 
+	</select>
+</mapper>

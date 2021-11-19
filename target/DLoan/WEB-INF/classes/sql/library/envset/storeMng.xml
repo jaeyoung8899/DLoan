@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="library.storemng">
+
+	<select id="selectStoreMng" parameterType="map" resultType="camelMap">
+	SELECT STORE_ID,
+		   PASSWORD,
+		   STORE_NAME,
+		   STORE_PHONE,
+		   HANDPHONE,
+		   LOGIN_FAILED_CNT,
+		   LIMIT_PRICE
+	  FROM DLOAN_STORE_TBL 
+	 ORDER BY STORE_ID
+	</select>
+	
+	<!-- 사용자 정보 개인정보 접속기록 보관-->
+	<insert id="selectStoreMngConnectionHistoryLog" parameterType="Map" >
+		INSERT INTO DLOAN_CONNECTION_HISTORY_LOG  (REC_KEY, WORKER_ID, TARGET_ID, WORK, REC_DATE, REC_IP, WORK_LOG_TYPE, WORK_LOG) VALUES (DLOAN_SEQ.NEXTVAL, #{libId}, '', '서점 담당자 정보 열람', SYSDATE, #{recIp}, '열람',
+      'SELECT STORE_ID, PASSWORD, STORE_NAME, STORE_PHONE, HANDPHONE, LOGIN_FAILED_CNT FROM DLOAN_STORE_TBL  ORDER BY STORE_ID')
+	</insert>
+	
+	<update id="updateStoreMng" parameterType="map">
+		UPDATE DLOAN_STORE_TBL
+		   SET STORE_PHONE = #{storePhone},
+		       HANDPHONE   = #{handphone},
+		       LIMIT_PRICE = #{limitPrice}
+		 WHERE STORE_ID    = #{storeId} 
+	</update>
+	
+	<insert id="updateStoreMngAccessRightsLog" parameterType="map">
+      INSERT INTO DLOAN_ACCESS_RIGHTS_LOG  (REC_KEY, TARGET_ID, REC_DATE, WORK_LOG_TYPE, WORK_LOG) VALUES (DLOAN_SEQ.NEXTVAL, #{storeId}, SYSDATE, '관리자 서점정보수정',
+      'UPDATE DLOAN_STORE_TBL SET STORE_PHONE = '''||#{storePhone}||''', HANDPHONE   = '''||#{handphone}||''' WHERE STORE_ID    = '''||#{storeId}||'''')
+   </insert>
+   
+	<insert id="updateStoreMngConnectionHistoryLog" parameterType="map">
+      INSERT INTO DLOAN_CONNECTION_HISTORY_LOG  (REC_KEY, WORKER_ID, TARGET_ID, WORK, REC_DATE, REC_IP, WORK_LOG_TYPE, WORK_LOG) VALUES (DLOAN_SEQ.NEXTVAL, #{userId}, #{storeId}, '서점 담당자 정보 수정', SYSDATE, #{recIp}, '수정',
+      'UPDATE DLOAN_STORE_TBL SET STORE_PHONE = '''||#{storePhone}||''', HANDPHONE   = '''||#{handphone}||''' WHERE STORE_ID    = '''||#{storeId}||'''')
+   </insert>
+	
+	<update id="updateStorePassword" parameterType="map">
+		UPDATE DLOAN_STORE_TBL
+		   SET PASSWORD = #{password}
+		 WHERE STORE_ID = #{storeId} 
+	</update>
+	
+	<update id="updatePasswordFaliCount" parameterType="Map">
+		UPDATE DLOAN_STORE_TBL
+		   SET LOGIN_FAILED_CNT = #{failCount}
+		 WHERE STORE_ID           = #{storeId}
+	</update>
+	
+	<select id="selectStoreMAC" parameterType="String" resultType="String">
+	SELECT STORE_MAC FROM DLOAN_STORE_MAC_TBL WHERE STORE_ID = #{storeId}
+	</select>
+	
+	<delete id="deleteStoreMAC" parameterType="String">
+	DELETE FROM DLOAN_STORE_MAC_TBL WHERE STORE_ID = #{storeId}
+	</delete>
+	
+	<insert id="deleteStoreMACAccessRightsLog" parameterType="String">
+      INSERT INTO DLOAN_ACCESS_RIGHTS_LOG  (REC_KEY, TARGET_ID, REC_DATE, WORK_LOG_TYPE, WORK_LOG) VALUES (DLOAN_SEQ.NEXTVAL, #{storeId}, SYSDATE, '관리자 서점MAC정보수정',
+      'DELETE FROM DLOAN_STORE_MAC_TBL WHERE STORE_ID = '''||#{storeId}||'''')
+   </insert>
+	
+	<insert id="insertStoreMAC" parameterType="map">
+	INSERT INTO DLOAN_STORE_MAC_TBL (STORE_ID, STORE_MAC) VALUES (#{storeId}, #{storeMac})
+	</insert>
+	
+	<insert id="insertStoreMACAccessRightsLog" parameterType="map">
+      INSERT INTO DLOAN_ACCESS_RIGHTS_LOG  (REC_KEY, TARGET_ID, REC_DATE, WORK_LOG_TYPE, WORK_LOG) VALUES (DLOAN_SEQ.NEXTVAL, #{storeId}, SYSDATE, '관리자 서점MAC정보수정',
+      'INSERT INTO DLOAN_STORE_MAC_TBL (STORE_ID, STORE_MAC) VALUES ('''||#{storeId}||''', '''||#{storeMac}||''')' )
+	</insert>
+
+
+	<select id="selectStorePhone" resultType="java.lang.String" parameterType="java.lang.String">
+		SELECT HANDPHONE FROM DLOAN_STORE_TBL WHERE STORE_ID = #{storeId}
+	</select>
+
+	<update id="updateStorePhone" parameterType="map">
+		UPDATE DLOAN_STORE_TBL SET HANDPHONE = #{phoneList} WHERE STORE_ID = #{storeId}
+	</update>
+	
+</mapper>

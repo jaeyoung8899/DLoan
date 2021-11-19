@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="library.login">
+	<!-- 사용자 정보 -->
+	<select id="getLibraryInfo" parameterType="Map" resultType="CamelMap">
+		SELECT LIB_MANAGE_CODE,
+				LIB_PHONE,
+				LIB_ID,
+				PASSWORD,
+				LIB_NAME,
+				HANDPHONE,
+				TO_DATE (TO_CHAR (SYSDATE, 'YYYYMMDD'), 'YYYYMMDD') - TO_DATE (TO_CHAR (CHANGE_PW_DATE, 'YYYYMMDD'), 'YYYYMMDD') CHANGE_PW_DAY,
+				LOGIN_FAILED_CNT
+  		   FROM DLOAN_LIB_TBL
+		  WHERE LIB_ID = #{libId}
+	</select>
+	
+	<!-- 사용자 정보 개인정보 접속기록 보관-->
+	<insert id="getLibraryInfoConnectionHistoryLog" parameterType="Map" >
+		INSERT INTO DLOAN_CONNECTION_HISTORY_LOG  (REC_KEY, WORKER_ID, TARGET_ID, WORK, REC_DATE, REC_IP, WORK_LOG_TYPE, WORK_LOG) VALUES (DLOAN_SEQ.NEXTVAL, #{libId}, #{libId}, '도서관 권한으로 접속하기위한 로그인', SYSDATE, #{recIp}, '접속',
+      'SELECT LIB_MANAGE_CODE, LIB_PHONE, LIB_ID, PASSWORD, LIB_NAME, HANDPHONE, TO_DATE (TO_CHAR (SYSDATE, ''YYYYMMDD''), ''YYYYMMDD'') - TO_DATE (TO_CHAR (CHANGE_PW_DATE, ''YYYYMMDD''), ''YYYYMMDD'') CHANGE_PW_DAY, LOGIN_FAILED_CNT FROM DLOAN_LIB_TBL  WHERE LIB_ID = '''||#{libId}||'''')
+	</insert>
+	
+	<select id="selectLibAllowIP" parameterType="String" resultType="String">
+	SELECT ALLOW_IP FROM DLOAN_LIB_IP_TBL WHERE LIB_ID = #{libId}
+	</select>
+	
+	<update id="updatePasswordChange" parameterType="Map">
+		UPDATE DLOAN_LIB_TBL
+		   SET CHANGE_PW_DATE  = SYSDATE
+		   <if test="password != null and password != ''">
+		      ,PASSWORD        = #{password}
+		   </if>
+		 WHERE LIB_ID = #{libId}
+	</update>
+	
+	<insert id="updatePasswordChangeAccessRightsLog" parameterType="map">
+      INSERT INTO DLOAN_ACCESS_RIGHTS_LOG  (REC_KEY, TARGET_ID, REC_DATE, WORK_LOG_TYPE, WORK_LOG) VALUES (DLOAN_SEQ.NEXTVAL, #{libId}, SYSDATE, '관리자 도서관비밀번호수정',
+      'UPDATE DLOAN_LIB_TBL SET CHANGE_PW_DATE  = SYSDATE <if test="password != null and password != ''">,PASSWORD        = '''||#{password}||'''</if> WHERE LIB_ID = '''||#{libId}||'''')
+   </insert>
+	
+	<update id="updatePasswordFaliCount" parameterType="Map">
+		UPDATE DLOAN_LIB_TBL
+		   SET LOGIN_FAILED_CNT = #{failCount}
+		 WHERE LIB_ID           = #{libId}
+	</update>
+</mapper>

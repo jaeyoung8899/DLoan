@@ -1,0 +1,238 @@
+@import url(http://fonts.googleapis.com/earlyaccess/nanumgothic.css);
+
+@media only screen
+and (min-device-width : 200px)
+and (max-device-width : 768px){
+
+
+}
+
+html,body{
+	position: relative;height:100%;width: 100%;
+	  font-family:'nanum gothic', sans-serif;
+}
+select{
+		border: none;
+    padding:0;
+    background:transparent;
+    box-shadow:none;
+    cursor:pointer;
+    border-right:0px; border-top:0px; border-left:0px; border-bottom:0px;
+    white-space: nowrap;
+    appearance: none;
+    -moz-appearance: none; /* Firefox */
+    -webkit-appearance: none; /* Safari and Chrome */
+    -webkit-box-shadow:none;
+    -webkit-user-select: none;
+  	overflow:visible;
+}
+select:focus, input:focus {outline: none;}
+.notice_wrap,
+.info_wrap,
+.search_form_01,
+.search_form_02,
+.search_form_03,
+.book_list_wrap,
+.search_list_form{
+  margin: 0 auto;margin-bottom: 10px;
+	width: 94%; height:auto;background: #ffffff;
+	border:1px solid #b2b2b2;
+	font-size:1.2em
+}
+.result_table,.btn_cancel{display: none;}
+.notice_wrap{
+	color:#000000; font-size:16px;font-weight:bold;
+}
+.notice_blue{
+	display: block;
+	font-size: 14px;color:#5a5a5a;font-weight:normal;
+}
+.input_wrap{
+	position:relative;
+	margin:0 auto;width:97%;height:50px;
+	border-bottom:1px solid #b2b2b2;
+}
+
+.search_form_01 label:first-of-type,
+.search_form_02 label,
+.search_form_03 label{
+	display: inline-block;
+  width:37.5%; height:50px;
+	background:#ffffff;line-height: 50px;
+	font-weight: bold;color: #323232;
+	margin-right:1.5%;
+	font-size:18px;text-indent:3%;
+	text-align: left;box-sizing:border-box;
+}
+.search_form_03 .input_wrap:last-of-type,
+.search_form_02 .input_wrap:last-of-type{height:auto;}
+.search_form_03 .input_wrap:last-of-type label{display: none;}
+
+
+.tab_wrap{width: 100%; height:45px;margin-bottom: 10px}
+.tab_wrap>a{
+	float:left;
+	width: 50%; height:100%;line-height:40px;
+	text-align: center;background: #ffffff;
+	font-size:1rem; font-weight: bold;
+	border-bottom: 3px solid #b2b2b2;
+	box-sizing: border-box;color:#b2b2b2;
+}
+
+.tab_wrap>a:active,
+a.on{color:#000000;
+	border-bottom: 3px solid #f03800;
+}
+
+.info_wrap,.notice_wrap{
+	padding:20px; box-sizing:border-box;
+	font-size:15px;line-height:1.5rem;
+	}
+.info_wrap>h3{color:#000000; font-size:16px;font-weight:bold;}
+.info_wrap>h3>img{display: none;}
+.info_wrap li{
+	text-indent: 15px;
+  font-size: 14px;color:#5a5a5a;
+  background: url(../images/icon-notice-s.png) no-repeat 0 7px;}
+.info_wrap span.orange{color:#FF6804; font-weight:bold;}
+.info_wrap p, .info_wrap li:last-of-type{margin-bottom:25px;}
+.info_wrap ul:last-of-type>li:last-of-type{margin-bottom:0;}
+
+.search_form_02{position:relative}
+.input_wrap{
+
+	}
+.input_wrap:last-of-type{border-bottom:none;}
+.input_wrap .name_label{
+	display:inline-block;
+	margin-top:15px;margin-right:1.5%;
+	width:37.5%;height:20px;
+	font-size:15px;text-indent:1.5%;
+	font-weight:bold;box-sizing:border-box;
+	border-right:2px solid #b2b2b2;
+	}
+.input_wrap .input_170,input.input_170,input.input_120{
+	width:48%; height:30px;
+	margin-top:5px;padding-left:5px;
+	border:1px solid #b2b2b2;
+	border-radius:6px;box-sizing:border-box;
+}
+.input_wrap .input_50{
+	width:13%; height:30px;
+	margin-top:5px;padding-left:5px;
+	border:1px solid #b2b2b2;
+	border-radius:6px;box-sizing:border-box;
+}
+.input_wrap .select_130, .select_200{
+	width:57%; height:30px;
+	border:1px solid #b2b2b2;box-sizing:border-box;
+	border-radius:6px;padding-left:10px;
+	background:url(../images/app-ti.png) no-repeat 96% 50%;
+}
+.input_wrap .select_130{position: relative;top:10px;}
+input.radio{display: none}
+.input_wrap>label.up{
+	font-size:13px;color:#5a5a5a;
+	line-height: 26px;
+}
+input.radio+label.up{
+  position:relative; display: inline-block;
+  height:27px; padding-left: 30px;
+  background: url(../images/btn_check_normal.png) no-repeat 0 0;
+	top:-1px;
+}
+input.radio:checked+label.up{background:url(../images/btn_check_clicked.png) no-repeat 0 0;}
+.btn_wrap{width:100%; height:45px;text-align:center;}
+input.btn_search{
+	margin:20px 8%;
+	width:85%;height:50px;
+	background:#6cb740;
+	color:#ffffff;font-size:15px;
+	font-weight:bold;
+}
+.input_wrap .input_100{
+	width:25.5%; height:30px;
+	margin-top:10px;padding-left:5px;
+	border:1px solid #b2b2b2;
+	border-radius:6px;box-sizing:border-box;
+}
+
+/*검색결과------------------------------------------------------------------------------------------------------*/
+.book_list_wrap{
+	margin: 0 auto;margin-bottom: 10px;
+	width: 94%;
+	background: #ffffff;
+	border:1px solid #b2b2b2;
+}
+.book_list_wrap>p,.search_list_form>p{
+	text-indent:4%;
+	width:100%; height:35px;
+	font-size:13px;font-weight:bold;
+	line-height:35px;
+	border-bottom:3px solid #f03800;
+}
+.book_list_wrap>p .count{color:#f03800;font-weight:bolder;}
+.book_list_wrap{}
+.book_list_wrap .book_info{
+	display:block;clear:both;
+	position:relative;
+	height:130px;
+	border-bottom:1px solid #b2b2b2;
+	}
+.book_list_wrap .book_info:last-of-type{border-bottom:none;}
+.book_list_wrap img{
+	float:left;margin:2px 4%;
+	max-width:80px;max-height:120px;
+	width:80px;height:120px;
+}
+.book_list_wrap dl{}
+.book_list_wrap dt,
+.result_book_list dt{
+	margin:7px 0;
+	font-size:14px;font-weight:bold;
+	}
+.book_list_wrap dd,
+.result_book_list dd{font-size:12px;color:#a0a0a0}
+.book_list_wrap dd.blue{font-size:13px; color:#439edd}
+
+
+input.btn_apply{
+	position: absolute;bottom:5px;
+	margin-top:10px;
+	width:66%;height:35px;
+	background:#6cb740;
+	color:#ffffff;font-size:15px;
+	font-weight:bold;
+}
+
+.apply_info{
+	position:relative;
+	padding: 0 4%;padding-bottom:10px;box-sizing:border-box;
+	border-bottom:1px solid #e6e6e6;
+}
+.apply_info:last-of-type{border-bottom:none;}
+.apply_table{margin-top:10px;border:1px solid #b2b2b2;width:100%;}
+.apply_table tr{text-align:center;height:30px;}
+.apply_table th{
+	position:relative;font-size:13px;
+	width:25%; height:20px; background: #e6e6e6
+	}
+.apply_table td{
+	position:relative;
+	font-size:13px;
+	width:25%; height:30px;
+	}
+.apply_table span{
+	position:absolute; top:5px; right:0;
+	display:inline-block; height:20px;
+	border-right:1px solid #b2b2b2;
+	}
+input.btn_29{
+	position:absolute; top:0; right:4%;
+	margin-top:7px;margin-bottom:7px;
+	width:29%;height:35px;
+	background:#6cb740;
+	color:#ffffff;font-size:15px;
+	font-weight:bold;
+}
+.board_navi{display: none;}
