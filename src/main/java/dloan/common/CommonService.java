@@ -253,4 +253,15 @@ public class CommonService {
 		msg = msg.replace("#{발신번호}"		, StringUtils.defaultString(convData.get("storePhone")));
 		return msg;
 	}
+
+	/**
+	 * 설정조회
+	 *
+	 */
+	public List<Map<String,Object>> getViewOptionList() {
+		//화면제어
+		List<Map<String,Object>> viewList = (List<Map<String, Object>>) commonDao.selectList("common.env.getViewOption");
+
+		return viewList;
+	}
 }
