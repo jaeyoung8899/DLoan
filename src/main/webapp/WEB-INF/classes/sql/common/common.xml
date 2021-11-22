@@ -83,6 +83,23 @@
 		}
 	</update>
 	
+	<update id="alimTalkSend" statementType="CALLABLE" parameterType="Map">
+		{CALL ALIMTALK_TOT_SEND_PROC(
+			  #{userKey}
+			, 0
+			, #{sender,jdbcType=CHAR,javaType=java.lang.String, mode=IN}
+			, #{recever,jdbcType=CHAR,javaType=java.lang.String, mode=IN}
+			, #{msg,jdbcType=VARCHAR,javaType=java.lang.String, mode=IN}
+			, NULL
+			, #{libManageCode,jdbcType=VARCHAR,javaType=java.lang.String, mode=IN}
+			, #{smsType,jdbcType=CHAR,javaType=java.lang.String, mode=IN}
+			, #{worker,        jdbcType=VARCHAR}
+			, TO_CHAR(SYSDATE, 'YYYY/MM/DD HH24:MI:SS')
+			, #{userName,jdbcType=VARCHAR,javaType=java.lang.String, mode=IN}
+			, #{alimMsg,jdbcType=VARCHAR,javaType=java.lang.String, mode=IN}
+		)}
+	</update>
+	
 	<update id="smsSend2" statementType="CALLABLE" parameterType="Map">
 		{ CALL SMS_TOT_SEND_LIB_PROC (
 			#{userKey},
@@ -161,5 +178,17 @@
 		  FROM DLOAN_SMS_CONF_TBL
 		 WHERE NAME    = #{name}
 		   AND AUTO_YN = #{autoYn}
+	</select>
+	
+	
+	<select id="getAlimContents" parameterType="Map"  resultType="Map">
+		SELECT TPL_NAME,
+			   TPL_CODE,
+			   TPL_MESSAGE
+		  FROM ECO_ALIMTALK_MAPPING_TBL
+		 WHERE SMS_NAME = #{smsName}
+		   AND SMS_TYPE = #{smsType}
+		   AND USE_YN = #{useYn}
+		   AND MANAGE_CODE = #{manageCode}
 	</select>
 </mapper>
