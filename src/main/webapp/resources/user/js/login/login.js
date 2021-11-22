@@ -58,8 +58,9 @@ var login = {
 		
 		// 
 		$.commAjax (option, function (result) {
+			console.log(result)
 			if (result.resultCode == "Y") {
-				location.href = _ctx + $('#retUrl').val();
+				// location.href = _ctx + $('#retUrl').val();
 			} else {
 				
 				alert(result.resultMessage);

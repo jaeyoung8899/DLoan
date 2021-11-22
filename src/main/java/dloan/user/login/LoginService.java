@@ -1,7 +1,9 @@
 package dloan.user.login;
 
+import java.util.List;
 import java.util.Map;
 
+import dloan.common.CommonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,10 @@ public class LoginService {
 
 	@Autowired
 	protected CommonDao commonDao;
+
+	@Autowired
+	private CommonService commonService;
+
 	
 	/**
 	 * 회원정보 조회
@@ -70,11 +76,14 @@ public class LoginService {
 					SessionUtils.setUserInfo(userInfo);
 				}
 			}
+
 		} else {
 			return ValidUtils.resultErrorMap("아이디와 비밀번호를 확인해주세요.");
 		}
-		
-		return ValidUtils.resultSuccessMap();
+		retMap.put("viewOptionInfo",commonService.getViewOptionList());
+		retMap.putAll(ValidUtils.resultSuccessMap());
+
+		return retMap;
 	}
 	
 	/**
