@@ -27,7 +27,18 @@
 	
 	<!-- Activates @Scheduled and @Async annotations for scheduling -->
 	<task:annotation-driven />
-	
+
+	<!--<beans:bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"/>
+
+	<beans:bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">
+		&lt;!&ndash; HandlerMapping을 여러개 설정할 수 있으며, 우선순위 설정가능 &ndash;&gt;
+		<beans:property name="order" value="0"/>
+		<beans:property name="interceptors" ref="DloanInterceptor"/>
+	</beans:bean>
+
+	<beans:bean id="DloanInterceptor"  class="dloan.common.interceptor.DloanInterceptor"/>-->
+
+
 	<beans:bean id="beanNameViewResolver" class="org.springframework.web.servlet.view.BeanNameViewResolver">
 		<beans:property name="order" value="0" />
 	</beans:bean>
@@ -68,8 +79,9 @@
 			<exclude-mapping path="/lib/confirm*"/>
 			<!-- 공통 -->
 			<exclude-mapping path="/common/*"/>
-			
+
 			<beans:bean class="dloan.common.handler.SessionInterceptor"></beans:bean>
+<!--			<beans:bean id="DloanInterceptor"  class="dloan.common.interceptor.DloanInterceptor"/>-->
 		</interceptor>
 	</interceptors>
 	
