@@ -108,7 +108,12 @@ public class LoginService {
 		// 개인정보 접속기록 보관
 		params.put("recIp", SessionHandler.getClientIpAddr());
 		this.commonDao.insert("getStoreInfoConnectionHistoryLog", params);
-		
+
+		//책값반환제 인가
+		if(params.get("storeYn").equals("Y")){
+			storeInfo.put("storeYn","Y");
+		}
+
 		// 세션 생성.
 		SessionUtils.setStoreInfo(storeInfo);
 		retMap.putAll(ValidUtils.resultSuccessMap());

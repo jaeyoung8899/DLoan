@@ -49,6 +49,11 @@ var libResponseDetail = {
 		$("#btnPDFDown2").on('click', function (event) {
 			libResponseDetail.pdfDownload();
 		});
+
+		if(comm.getViewOptionData_value('009','ALL') === 'Y'){
+			$('#pdfYn').css('display','inline');
+		}
+
 	},
 	
 		
@@ -87,9 +92,16 @@ var libResponseDetail = {
 		
 		var arRecKey    = new Array();
 		var arResStatus = new Array();
+		var arReturnBookReason = new Array();
 		$("#detailInfo > tbody > tr").each(function(i, el) {
 			arRecKey.push($(el).find('input[name=recKey]').val());
 			arResStatus.push($(el).find(':radio[name*="choice_"]:checked').val());
+
+			if($(el).find('input[name=returnReason]').val()==""){
+				arReturnBookReason.push(" ");
+			}else{
+				arReturnBookReason.push($(el).find('input[name=returnReason]').val());
+			}
 		});
 		
 		
@@ -98,6 +110,7 @@ var libResponseDetail = {
 				ltRecKey    : arRecKey,
 				resKey      : $('#resKey').val(),
 				ltResStatus : arResStatus,
+				ltReturnBookReason : arReturnBookReason
 			};
 			
 			var option = {
@@ -144,16 +157,23 @@ var libResponseDetail = {
 		}
 	},
 	radioAll :  function (type) {
-		$("#detailInfo > tbody > tr > td > :radio[name*='choice_']").each(function(i, el) {
-			
-			var isDisabled = $(el).parent().find(':radio').attr('disabled');
-			if (isDisabled == 'disabled' || isDisabled == true) {
-				return false;
-			}
-			
-			var name = $(el).parent().find(':radio').attr('name');
-			$(el).parent().find(":radio[name='"+name+"']:radio[value='"+type+"']").prop('checked', true);
-		});
+		if( type == 'L02'){
+			// 반품
+			$('#txtReturnReason').val('');
+			returnReasonPop.strType = "ALL";
+			returnReasonPop.open();
+		}else{
+			//구입
+			$("#detailInfo > tbody > tr > td > :radio[name*='choice_']").each(function(i, el) {
+				var isDisabled = $(el).parent().find(':radio').attr('disabled');
+				if (isDisabled == 'disabled' || isDisabled == true) {
+					return false;
+				}
+				$(el).parent().find("[id*=prevRadioValue_]").val('L01');
+				var name = $(el).parent().find(':radio').attr('name');
+				$(el).parent().find(":radio[name='"+name+"']:radio[value='"+type+"']").prop('checked', true);
+			});
+		}
 	},
 	
 	excelDown : function() {
@@ -162,6 +182,18 @@ var libResponseDetail = {
 			form.setUrl( _ctx + "/lib/libResExcelDown");
 			form.submit();
 		}
+	},
+
+	/**
+	 * 반품 버튼 클릭
+	 */
+	retClick : function (row) {
+
+		returnReasonPop.vPrevVal = $("#prevRadioValue_"+row).val();
+
+		returnReasonPop.nRow = row;
+		returnReasonPop.open();
+		$("#prevRadioValue_"+row).val('L02');
 	},
 		
 	/**
@@ -186,12 +218,129 @@ var libResponseDetail = {
 			form.setUrl( _ctx + "/lib/libResPdfDownload");
 			form.submit();
 		}
-	}
+	},
+	/**
+	 * 반품 내용 확인 버튼
+	 */
+	retPopup : function(row) {
+		returnReasonPop.nRow = row;
+		returnReasonPop.open();
+	},
 	
 };
+
+//반품사유 팝업
+var returnReasonPop = {
+	nRow : 0 ,
+	vPrevVal : "L01",
+	strType : "",
+	init : function () {
+		this.events();
+	},
+	// 버튼 초기화
+	events : function () {
+		// 닫기 버튼 ()
+		$("#btnModalClose").on('click', function (event) {
+			returnReasonPop.close();
+		});
+		// 확인 버튼
+		$('#btnApply').on('click', function(event) {
+			returnReasonPop.apply();
+		});
+		// 취소 버튼
+		$('#btnCancel').on('click', function(event) {
+			returnReasonPop.close();
+		});
+		// 닫기 버튼 (그냥닫음)
+		$("#btnClose").on('click', function (event) {
+			returnReasonPop.strType = "ALL";
+			returnReasonPop.close();
+		});
+	},
+
+	// 팝업 띄울 때 작업
+	open : function() {
+
+		if(returnReasonPop.strType == "ALL"){
+			$("#txtBookTitle").text("반품사유 (일괄수정) ");
+			$("#returnReasonPop").show();
+		}else{
+			if(returnReasonPop.nRow < 1 ){
+				alert("오류가 발생했습니다.");
+				//$("input:radio[name='"+radioName+"']:radio[value='L01']").prop('checked', true);
+				return;
+			}
+
+
+			var sTitle = $("#tbTitle_"+returnReasonPop.nRow).text();
+			if( sTitle.length > 45 ) sTitle = sTitle.substr(0,45)+"...";
+
+			$("#txtBookTitle").text("반품사유 ("+sTitle+") ");
+
+			// 반품 사유 
+			var v_returnReason = $('input[name=returnReason]')[returnReasonPop.nRow-1].value;
+			$('#txtReturnReason').val(v_returnReason);
+			$("#returnReasonPop").show();
+		}
+	},
+
+	//, 취소버튼 클릭
+	close : function() {
+
+		if(returnReasonPop.strType == "ALL"){
+
+			returnReasonPop.strType = "";
+		}else{
+			var prevCheck = returnReasonPop.vPrevVal;
+
+			$("#prevRadioValue_"+returnReasonPop.nRow).val(prevCheck);
+			//요청은 구입과 동일하게 
+			if(prevCheck == 'S01') prevCheck = 'L01';
+			// 이전으로 되돌리기
+			$("input:radio[name='choice_"+returnReasonPop.nRow+"']:radio[value='"+prevCheck+"']").prop('checked', true);
+		}
+		$("#returnReasonPop").hide();
+	},
+
+	// 확인 버튼 클릭
+	apply : function () {
+
+		if(returnReasonPop.strType == "ALL"){
+			$("#detailInfo > tbody > tr > td > :radio[name*='choice_']").each(function(i, el) {
+
+				var isDisabled = $(el).parent().find(':radio').attr('disabled');
+				if (isDisabled == 'disabled' || isDisabled == true) {
+					return false;
+				}
+
+				// 반품사유
+				$(el).parent().find("[name='returnReason']").val($('#txtReturnReason').val());
+				// 라디오버튼 체크
+				var name = $(el).parent().find(':radio').attr('name');
+				$(el).parent().find(":radio[name='"+name+"']:radio[value='L02']").prop('checked', true);
+				// 이전값 입력
+				$(el).parent().find("[id*=prevRadioValue_]").val('L02');
+
+			});
+
+			returnReasonPop.strType = "";
+			$("#returnReasonPop").hide();
+		}else{
+			if($("#txtReturnReason").val().length < 1){
+				alert("반품사유를 입력해 주세요.");
+				return;
+			}
+			$('input[name=returnReason]')[returnReasonPop.nRow-1].value = $('#txtReturnReason').val();
+			$("#returnReasonPop").hide();
+		}
+	}
+};
+
 
 // onload 
 $(document).ready(function() {
 	// 신청승인
 	libResponseDetail.init();
+
+	returnReasonPop.init();
 });

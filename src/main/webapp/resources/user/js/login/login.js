@@ -58,9 +58,10 @@ var login = {
 		
 		// 
 		$.commAjax (option, function (result) {
-			console.log(result)
 			if (result.resultCode == "Y") {
-				// location.href = _ctx + $('#retUrl').val();
+				localStorage.setItem("viewOptionInfo",JSON.stringify(result.viewOptionInfo));
+				var viewCode = comm.getViewOptionData_value('001','ALL');
+				location.href = _ctx +$('#retUrl').val()+'?viewCode='+viewCode;
 			} else {
 				
 				alert(result.resultMessage);

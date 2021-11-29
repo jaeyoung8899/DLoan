@@ -141,7 +141,7 @@ public class LibRequestService {
 		
 		// SMS양식조회
 		Map<String, String> smsParam = new HashMap<String, String>();
-		smsParam.put("name"  , "도서관신청거절 (자동발송)");
+		smsParam.put("smsType"  , "DLN10");
 		smsParam.put("autoYn", "Y");
 
 		String smsMsg = (String) this.commonDao.selectOne("common.getSmsContents", smsParam);
@@ -177,6 +177,13 @@ public class LibRequestService {
 						smsMap.put("worker"       , "DLOAN-LIB");
 						smsMap.put("userName"     , user.get("name"));
 						smsMap.put("reqStatus"	  , "S04");
+						smsMap.put("smsType"  , "DLN10");
+
+						String alimMsg = commonService.convAlimMsg(smsParam,convData);
+						if(!alimMsg.equals("")){
+							smsMap.put("alimMsg",alimMsg);
+						}
+
 						smsList.add(smsMap);
 						
 					}
@@ -331,7 +338,7 @@ public class LibRequestService {
 		
 		// SMS양식조회
 		Map<String, String> smsParam = new HashMap<String, String>();
-		smsParam.put("name"  , "배분도서관수정(자동발송)");
+		smsParam.put("smsType"  , "DLN11");
 		smsParam.put("autoYn", "Y");
 
 		String smsMsg = (String) this.commonDao.selectOne("common.getSmsContents", smsParam);
@@ -354,6 +361,12 @@ public class LibRequestService {
 		smsMap.put("worker"       , "DLOAN-LIB");
 		smsMap.put("userName"     , reqInfo.get("libManageName"));
 		smsMap.put("reqStatus"	  , reqInfo.get("reqStatus"));
+		smsMap.put("smsType"  , "DLN11");
+
+		String alimMsg = commonService.convAlimMsg(smsParam,convData);
+		if(!alimMsg.equals("")){
+			smsMap.put("alimMsg",alimMsg);
+		}
 		smsList.add(smsMap);
 		
 		}

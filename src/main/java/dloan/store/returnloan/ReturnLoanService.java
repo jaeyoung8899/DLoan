@@ -39,6 +39,7 @@ public class ReturnLoanService {
 	 * @return 대출반납정보
 	 */
 	public Map<String, Object> selectReturnLoanInfo(Map<String, String> params) {
+		params.put("storeYn",SessionUtils.getStoreYn());
 		return (Map<String, Object>) commonDao.selectPagingList(NAME_SPACE.concat("selectReturnLoanInfo"), params);
 	}
 	
@@ -202,7 +203,7 @@ public class ReturnLoanService {
 		Map<String, Object> smsMap = null;
 		
 		Map<String, String> smsParam = new HashMap<String, String>();
-		smsParam.put("name", "반납예정일안내 (자동발송)");
+		smsParam.put("smsType", "DLN07");
 		smsParam.put("autoYn", "Y");
 
 		String smsMsg = (String) commonDao.selectOne("common.getSmsContents", smsParam);
@@ -230,6 +231,12 @@ public class ReturnLoanService {
 			smsMap.put("msg"          , "{\"type\":\"SM\",\"msg\":\""+tmpMsg+"\"}");
 			smsMap.put("libManageCode", reqInfo2.get("libManageCode"));
 			smsMap.put("worker",        "DLOAN-STORE");
+			smsMap.put("smsType"  , "DLN07");
+
+			String alimMsg = commonService.convAlimMsg(smsParam,convData);
+			if(!alimMsg.equals("")){
+				smsMap.put("alimMsg",alimMsg);
+			}
 
 			if (smsMap.get("recever") != null) {
 				smsList.add(smsMap);

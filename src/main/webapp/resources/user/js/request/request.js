@@ -70,20 +70,15 @@ var request = {
 				alert('SMS수신 여부 동의하지 않으면 서비스에 제한이 있습니다');
 			}
 		});
-		
-		var today = comm.date.formatDateToStr(new Date(), 'yyyy/MM/dd HH:mm:ss');
-		
-		var LimitStartDay = '2019/12/11 09:00:00';
-		var LimitEndDay = '2019/12/16 00:00:01';
-		if(today >= LimitStartDay && today <= LimitEndDay) {
-			$("#selStore").on('change', function() {
-				alert('12월 16일 부터 서비스를 시작합니다.');
-				$(this).val('');
-			});
-		}
-		
+
+		//헤더 표시여부
+		// var headerYn = comm.getViewOptionData_value('002','ALL');
+		// if(headerYn === 'Y') {
+		// 	$('#reqHeader').show();
+		// }
+
 	},
-	
+
 	/**
 	 * 조회
 	 */
@@ -115,16 +110,16 @@ var request = {
 	 * 신청
 	 */
 	userRequest : function($this) {
-		
-		
-		var today = comm.date.formatDateToStr(new Date(), 'yyyy/MM/dd HH:mm:ss');
+
+
+		/*var today = comm.date.formatDateToStr(new Date(), 'yyyy/MM/dd HH:mm:ss');
 		var LimitStartDay = '2019/12/11 00:00:01';
 		var LimitEndDay = '2019/12/16 00:00:01';
 		if(today >= LimitStartDay && today <= LimitEndDay) {
 				alert('12월 16일 부터 서비스를 시작합니다.');
 				return false;
-		}
-		
+		}*/
+
 		//vlaidatiton
 		if (!commFormValid('requestForm')) {
 			return false;

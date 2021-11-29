@@ -297,17 +297,24 @@ var returnLoan = {
 	 * 대출 버튼 클릭
 	 */
 	storeLoan : function($this) {
-		/* 카드비밀번호 사용하지 않음
-		cardPasswdPop.open(
-			$($this).parent().parent().find('input[name=recKey]').val(),
-			$($this).parent().parent().find('input[name=userNo]').val()
-		);
-		*/
-		loanPop.open(
+		/* 카드비밀번호 사용하지 않음*/
+		var cardYn = comm.getViewOptionData_value('005','ALL');
+		if(cardYn === 'Y'){
+			cardPasswdPop.open(
+				$($this).parent().parent().find('input[name=recKey]').val(),
+				$($this).parent().parent().find('input[name=userNo]').val()
+			);
+		}else{
+			loanPop.open(
 				$($this).parent().parent().find('input[name=recKey]').val(),
 				$($this).parent().parent().find('input[name=userNo]').val(),
 				$($this).parent().parent().find('input[name=title]').val()
 			);
+		}
+
+
+
+
 	},
 	
 	/**
@@ -609,7 +616,13 @@ var loanPop = {
 			var recKey = $("#loanRecKey").val();
 			var userNo = $("#loanUserNo").val();
 			var appendixYn = $("#appendix_yn").is(":checked") ? "Y" : "N";
-			
+			var appendixYn1 = $("#appendix_yn1").is(":checked") ? "Y" : "N";
+			if(appendixYn ==='Y' || appendixYn1 === 'Y'){
+				appendixYn = 'Y';
+			}else{
+				appendixYn = 'N';
+			}
+
 			var option = {
 				url   : _ctx + '/store/updateStoreLoan',
 				param : {

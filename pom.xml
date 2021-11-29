@@ -357,6 +357,19 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.4</version>
+				<configuration>
+					<warName>${project.artifactId}</warName>
+
+					<!-- web.xml 파일이 없어도 에러 발생 무시 -->
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+
+					<!-- target 안에 있는 source-file/META-INF/context.xml 제외  -->
+					<warSourceExcludes>META-INF/context.xml</warSourceExcludes>
+
+					<!-- target 안에 있는 war-file/META-INF/context.xml 제외  -->
+					<packagingExcludes>META-INF/context.xml</packagingExcludes>
+
+				</configuration>
 			</plugin>
 
 			<plugin>

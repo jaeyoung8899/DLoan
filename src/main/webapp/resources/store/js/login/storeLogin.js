@@ -11,7 +11,8 @@ var login = {
 	},
 	
 	events : function () {
-		
+
+
 		var userInputId = login.getCookie("userInputId");
 	    var setIdCookieYN = login.getCookie("setIdCookieYN");
 	    var userInputPw = login.getCookie("userInputPw");
@@ -32,7 +33,7 @@ var login = {
 			$("#inputPassword").val('');
 	        $("#save_pw").prop("checked", false);
 	    }
-		
+
 		$('#inputId').on('keydown', function(e) {
 			var keyCode = e.keyCode || e.which;
 			if (keyCode == 13) {
@@ -57,6 +58,10 @@ var login = {
 		$("#btnSubmit").on('click', function (event) {
 			login.login();
 		});
+
+		//스토리지저장
+		login.getViewInfo();
+
 	},
 		
 	/**
@@ -67,20 +72,27 @@ var login = {
 		if (!login.valid()) {
 			return false;
 		}
-		
-		//맥주소 체크 사용하지 않음
-		//login.getMac(login.loginProc);
-		login.loginProc();
+
+		//맥주소 체크
+		var macUseYn = comm.getViewOptionData_value('003','ALL');
+		if(macUseYn !=='undefined' && macUseYn !== undefined && macUseYn !== '' && macUseYn === 'Y') {
+			login.getMac(login.loginProc);
+		}else{
+			login.loginProc();
+		}
+
 	},
 	
 	loginProc : function(mac) {
+		var returnYn = comm.getViewOptionData_value('004','ALL');
 		
 		var option = {
 			url      :  _ctx + '/store/loginProc',
 			param    : $.param({
 				storeId       : $('#inputId').val(),
 				storePassword : $('#inputPassword').val(),
-				storeMac      : mac
+				storeMac      : mac,
+				storeYn       : returnYn
 			}, true),
 			isLdBar  : false
 		};
@@ -103,7 +115,7 @@ var login = {
 					login.deleteCookie("userInputPw");
             		login.deleteCookie("setPwCookieYN");
 				}
-				
+
 				if (result.isChangePw) {
 					location.href = _ctx + "/store/storePasswordChange?isNext=true";
 				} else {
@@ -182,7 +194,22 @@ var login = {
 				return unescape(y);
 			}
 		}
+	},
+	getViewInfo : function () {
+		$.ajax({
+			crossOrigin: true,
+			type       : 'GET',
+			url        : _ctx + '/common/getConfig',
+			datatype   : 'json',
+			success    : function(data) {
+				localStorage.setItem("viewOptionInfo",JSON.stringify(data));
+			},
+			error      : function() {
+				alert('데이터가져오기실패');
+			}
+		});
 	}
+	
 };
 
 // onload 

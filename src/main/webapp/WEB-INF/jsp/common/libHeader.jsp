@@ -26,6 +26,8 @@
 					<li><a class="menu_tab01<c:if test="${requestScope['javax.servlet.forward.request_uri'] eq '/lib/libRequestInfo'}">_on</c:if>" href="${ctx}/lib/libRequestInfo" >신청승인</a></li>
 					<li><a class="menu_tab02<c:if test="${requestScope['javax.servlet.forward.request_uri'] eq '/lib/libResponseInfo' or requestScope['javax.servlet.forward.request_uri'] eq '/lib/libResponseInfoDetail'}">_on</c:if>" href="${ctx }/lib/libResponseInfo">납품요청</a></li>
 					<li><a class="menu_tab03<c:if test="${fn:indexOf(requestScope['javax.servlet.forward.request_uri'], '/lib/statistics/') != -1}">_on</c:if>" href="${ctx }/lib/statistics/byYearStat">통계</a></li>
+					<li id="spendingYn" style="display: none;"><a class="menu_tab05<c:if test="${fn:indexOf(requestScope['javax.servlet.forward.request_uri'], '/lib/spending') != -1}">_on</c:if>"  href="${ctx }/lib/spending">지출결의</a></li>
+					<li><a class="menu_tab06<c:if test="${fn:indexOf(requestScope['javax.servlet.forward.request_uri'], '/lib/sms') != -1}">_on</c:if>"  href="${ctx }/lib/sms">SMS</a></li>
 					<li><a class="menu_tab04<c:if test="${fn:indexOf(requestScope['javax.servlet.forward.request_uri'], '/lib/envset/') != -1}">_on</c:if>" href="${ctx }/lib/envset/libOrdered">환경설정</a></li>
 				</ul>
 			</div>

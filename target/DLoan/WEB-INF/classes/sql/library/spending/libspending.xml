@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lib.spending">
+	
+	<select id="selectLibSpendingInfo" parameterType="Map" resultType="camelMap">
+		<include refid="common.pagingPre" />
+		SELECT 
+			ROW_NUMBER() OVER (ORDER BY 
+			<choose>
+				<when test='sortCol == "LIB_NAME" and order =="ASC"'>
+				LIB_NAME ASC
+				</when>
+				<when test='sortCol == "LIB_NAME" and order =="DESC"'>
+				LIB_NAME DESC
+				</when>
+				<when test='sortCol == "CLASS" and order =="ASC"'>
+				CLASS ASC
+				</when>
+				<when test='sortCol == "CLASS" and order =="DESC"'>
+				CLASS DESC	
+				</when>
+				<when test='sortCol == "FISCAL_YEAR" and order =="ASC"'>
+				FISCAL_YEAR ASC
+				</when>
+				<when test='sortCol == "FISCAL_YEAR" and order =="DESC"'>
+				FISCAL_YEAR DESC
+				</when>
+				<when test='sortCol == "BUDGET" and order =="ASC"'>
+				BUDGET ASC
+				</when>
+				<when test='sortCol == "BUDGET" and order =="DESC"'>
+				BUDGET DESC
+				</when>
+				<when test='sortCol == "DEADLINE" and order =="ASC"'>
+				DEADLINE ASC
+				</when>
+				<when test='sortCol == "DEADLINE" and order =="DESC"'>
+				DEADLINE DESC
+				</when>
+				<when test='sortCol == "REG_DATE" and order =="ASC"'>
+				REG_DATE ASC
+				</when>
+				<when test='sortCol == "REG_DATE" and order =="DESC"'>
+				REG_DATE DESC
+				</when>	
+				<otherwise>
+					FISCAL_YEAR DESC
+				</otherwise>
+			</choose>
+				) RNUM,
+				REC_KEY,
+				LIB_NAME,
+				CLASS,
+				DECODE(CLASS, '0', '반기별', '1', '분기별', '2', '월별', '3', '기간설정', '') AS CLASS_DESC,
+				FISCAL_YEAR,
+				BUDGET,
+				TO_CHAR(DEADLINE, 'yyyy-MM-dd') AS DEADLINE,
+				TO_CHAR(REG_DATE, 'yyyy-MM-dd') AS REG_DATE
+			FROM (SELECT
+					A.REC_KEY, B.LIB_NAME, A.CLASS, A.FISCAL_YEAR, A.BUDGET, A.DEADLINE, A.REG_DATE, A.LIB_MANAGE_CODE
+				FROM DLOAN_LIB_SPENDING_TBL A INNER JOIN DLOAN_LIB_TBL B 
+					ON A.LIB_MANAGE_CODE=B.LIB_MANAGE_CODE) MAIN
+				<where>
+					<if test='fiscalYear != null and fiscalYear != ""'>
+						AND FISCAL_YEAR LIKE '%' || #{fiscalYear} || '%'
+					</if>
+					<if test='libManageCode != null and libManageCode != ""'>
+						AND LIB_MANAGE_CODE = #{libManageCode} 
+					</if>
+				</where>
+		<include refid="common.pagingPost" />
+	</select>
+	
+	<select id="getRefundBookInfo" parameterType="Map" resultType="camelMap">
+		<include refid="common.pagingPre" />
+		SELECT
+			ROW_NUMBER() OVER (ORDER BY 
+			<choose>
+				<when test='sortCol == "STORE_NAME" and order =="ASC"'>
+					STORE_NAME ASC
+				</when>
+				<when test='sortCol == "STORE_NAME" and order =="DESC"'>
+					STORE_NAME DESC
+				</when>
+				<when test='sortCol == "LIB_NAME" and order =="ASC"'>
+					LIB_NAME ASC
+				</when>
+				<when test='sortCol == "LIB_NAME" and order =="DESC"'>
+					LIB_NAME DESC
+				</when>
+				<when test='sortCol == "TITLE" and order =="ASC"'>
+					TITLE ASC
+				</when>
+				<when test='sortCol == "TITLE" and order =="DESC"'>
+					TITLE DESC
+				</when>
+				<when test='sortCol == "AUTHOR" and order =="ASC"'>
+					AUTHOR ASC
+				</when>
+				<when test='sortCol == "AUTHOR" and order =="DESC"'>
+					AUTHOR DESC
+				</when>
+				<when test='sortCol == "PUBLISHER" and order =="ASC"'>
+					PUBLISHER ASC
+				</when>
+				<when test='sortCol == "PUBLISHER" and order =="DESC"'>
+					PUBLISHER DESC
+				</when>
+				<when test='sortCol == "RES_DATE" and order =="ASC"'>
+					RES_DATE ASC
+				</when>
+				<when test='sortCol == "RES_DATE" and order =="DESC"'>
+					RES_DATE DESC
+				</when>
+				<otherwise>
+					REQ_DATE DESC
+				</otherwise>
+			</choose>
+			) RNUM
+			, STORE_NAME
+			, LIB_NAME
+			, TITLE
+			, AUTHOR
+			, PUBLISHER
+			, RES_DATE
+			, RES_REMARK
+		FROM DLOAN_REQ_TBL req, DLOAN_LIB_TBL lib, DLOAN_STORE_TBL store, DLOAN_RES_TBL res
+		WHERE
+			req.LIB_MANAGE_CODE = lib.LIB_MANAGE_CODE AND req.STORE_ID = store.STORE_ID AND req.RES_KEY = res.REC_KEY AND req.RES_STATUS = 'L02'
+			<if test='libManageCode != null and libManageCode != ""'>
+				AND req.LIB_MANAGE_CODE = #{libManageCode}
+			</if>
+			<if test='storeId != null and storeId != ""'>
+				AND req.STORE_ID = #{storeId}
+			</if>
+			<if test='from_resDate != null and from_resDate != ""'>
+				AND res.RES_DATE &gt;= TRUNC(TO_DATE(#{from_resDate}))
+			</if>
+			<if test='to_resDate != null and to_resDate != ""'>
+				AND res.RES_DATE &lt;= TRUNC(TO_DATE(#{to_resDate})) + 0.99999
+			</if>
+		<include refid="common.pagingPost" />
+	</select>
+	
+	<select id="storeInfo" parameterType="map" resultType="camelMap">
+		SELECT
+			A.STORE_ID,B.STORE_NAME	
+		FROM 
+			DLOAN_LIB_ORDER_CONF_TBL A, DLOAN_STORE_TBL B
+		<where>
+			A.STORE_ID=B.STORE_ID
+			<if test="libManageCode != null">
+				AND LIB_MANAGE_CODE = #{libManageCode}
+			</if>
+		</where>
+	</select>
+	
+	<select id="getSpendingDetailInfo" parameterType="map" resultType="CamelMap">
+		SELECT
+			REC_KEY
+			, LIB_MANAGE_CODE
+			, (SELECT LIB_NAME FROM DLOAN_LIB_TBL A WHERE A.LIB_MANAGE_CODE=DLST.LIB_MANAGE_CODE) AS LIB_NAME
+			, CLASS
+			, FISCAL_YEAR
+			, BUDGET
+			, TO_CHAR(DEADLINE, 'yyyy-MM-dd') DEADLINE
+			<!-- FIXED Y: 수정할 수 없음, N: 수정 가능 -->
+			, CASE
+				WHEN TRUNC(DEADLINE) + 0.99999 &lt; SYSDATE THEN 'Y'
+				ELSE 'N'
+			END AS FIXED
+			, TO_CHAR(REG_DATE, 'yyyy-MM-dd') REG_DATE
+		FROM DLOAN_LIB_SPENDING_TBL DLST
+		WHERE REC_KEY = #{recKey}
+	</select>
+	
+	<select id="getStoreSpending" parameterType="map" resultType="CamelMap">
+		SELECT
+			dls.REC_KEY
+			, STORE_ID
+			, IDX
+			, TO_CHAR(START_DATE, 'yyyy-MM-dd') AS START_DATE
+			, TO_CHAR(END_DATE, 'yyyy-MM-dd') AS END_DATE
+			, PRICE
+			, (SELECT NVL(SUM(CASE WHEN RES_KEY IN ('1510758010','1510624002','1510589277','1510582125','1510578484','1510407122') THEN PRICE ELSE PRICE*90/100 END), 0) FROM DLOAN_REQ_TBL WHERE STORE_ID = dls.STORE_ID AND REQ_STATUS IS NOT NULL AND REQ_STATUS NOT IN ('U02','S02','L02','S08','S09') AND REQ_DATE BETWEEN START_DATE AND END_DATE) AS USED_PRICE
+		FROM DLOAN_LIB_SPENDING_INFO_TBL dls, DLOAN_LIB_SPENDING_TBL dl
+		WHERE
+			dls.PARENT_KEY = dl.REC_KEY
+			AND dl.REC_KEY = #{parentKey}
+			<if test="storeId != null">
+				AND dls.STORE_ID = #{storeId}
+			</if>
+		ORDER BY IDX
+	</select>
+	
+	<select id="getDuplicatedSpendingCount" parameterType="map" resultType="CamelMap">
+		SELECT
+			COUNT(1) AS CNT
+		FROM
+			DLOAN_LIB_SPENDING_TBL
+		<where>
+			LIB_MANAGE_CODE = #{libManageCode}
+			AND FISCAL_YEAR = #{fiscalYear}
+			<if test="recKey != null">
+				AND REC_KEY != #{recKey}
+			</if>
+		</where>
+	</select>
+	
+	<update id="updateSpending" parameterType="Map">
+		UPDATE
+			DLOAN_LIB_SPENDING_TBL
+		SET
+			LIB_MANAGE_CODE = #{libManageCode},
+			CLASS = #{class},
+			FISCAL_YEAR = #{fiscalYear},
+			BUDGET = #{budget},
+			DEADLINE = TO_DATE(#{deadline}),
+			MOD_DATE = SYSDATE,
+			MOD_USER_ID = #{libId}
+		WHERE
+			REC_KEY = #{recKey}
+	</update>
+	
+	<update id="updateSpendingInfo" parameterType="Map">
+		UPDATE
+			DLOAN_LIB_SPENDING_INFO_TBL
+		SET
+			IDX = #{idx},
+			START_DATE = TRUNC(TO_DATE(#{startDate})),
+			END_DATE = TRUNC(TO_DATE(#{endDate})) + 0.99999,
+			PRICE = #{price},
+			MOD_USER_ID = #{libId},
+			MOD_DATE = SYSDATE
+		WHERE
+			REC_KEY = #{recKey}
+	</update>
+	
+	<insert id="insertSpending" parameterType="Map">
+		<selectKey keyProperty="rKey" resultType="String" order="BEFORE">
+			SELECT DLOAN_SEQ.nextval FROM dual
+		</selectKey>
+		INSERT INTO DLOAN_LIB_SPENDING_TBL(REC_KEY, LIB_MANAGE_CODE, CLASS, FISCAL_YEAR, BUDGET, DEADLINE, REG_DATE, REG_USER_ID)
+		VALUES(#{rKey}, #{libManageCode}, #{class}, #{fiscalYear}, #{budget}, TO_DATE(#{deadline}), SYSDATE, #{libId})
+	</insert>
+	
+	<insert id="insertSpendingInfo" parameterType="Map">
+		INSERT INTO DLOAN_LIB_SPENDING_INFO_TBL(REC_KEY,PARENT_KEY,STORE_ID,IDX,START_DATE,END_DATE,PRICE,REG_DATE,REG_USER_ID)
+		VALUES(DLOAN_SEQ.NEXTVAL,#{parentKey},#{storeId},#{idx},TRUNC(TO_DATE(#{startDate})),TRUNC(TO_DATE(#{endDate})) + 0.99999,#{price},SYSDATE,#{libId})
+	</insert>
+	
+	<delete id="deleteSpendingInfo">
+		DELETE FROM DLOAN_LIB_SPENDING_INFO_TBL WHERE PARENT_KEY = #{recKey}
+	</delete>
+	
+	<delete id="deleteSpendingInfoByKey">
+		DELETE FROM DLOAN_LIB_SPENDING_INFO_TBL WHERE REC_KEY = #{recKey}
+	</delete>
+	
+	<delete id="deleteSpending">
+		DELETE FROM DLOAN_LIB_SPENDING_TBL WHERE REC_KEY = #{recKey}
+	</delete>
+	
+	<select id="getUsedPrice" parameterType="Map" resultType="CamelMap">
+		SELECT
+			  MONTH1_USED
+			, MONTH2_USED
+			, MONTH3_USED
+			, MONTH4_USED
+			, MONTH5_USED
+			, MONTH6_USED
+			, MONTH7_USED
+			, MONTH8_USED
+			, MONTH9_USED
+			, MONTH10_USED
+			, MONTH11_USED
+			, MONTH12_USED
+			, (MONTH1_USED + MONTH2_USED + MONTH3_USED + MONTH4_USED + MONTH5_USED + MONTH6_USED) AS HALF1_USED
+			, (MONTH7_USED + MONTH8_USED + MONTH9_USED + MONTH10_USED + MONTH11_USED + MONTH12_USED) AS HALF2_USED
+			, (MONTH1_USED + MONTH2_USED + MONTH3_USED) AS Q1_USED
+			, (MONTH4_USED + MONTH5_USED + MONTH6_USED) AS Q2_USED
+			, (MONTH7_USED + MONTH8_USED + MONTH9_USED) AS Q3_USED
+			, (MONTH10_USED + MONTH11_USED + MONTH12_USED) AS Q4_USED
+		FROM 
+			(SELECT
+				  (SELECT NVL(SUM(CASE WHEN RES_KEY IN ('1510758010','1510624002','1510589277','1510582125','1510578484','1510407122') THEN PRICE ELSE PRICE*90/100 END), 0) FROM DLOAN_REQ_TBL WHERE STORE_ID = dls.STORE_ID AND REQ_STATUS IS NOT NULL AND REQ_STATUS NOT IN ('U02','S02','L02','S08','S09') AND REQ_DATE BETWEEN TRUNC(TO_DATE(dl.FISCAL_YEAR || '/01', 'yyyy/MM')) and LAST_DAY(TO_DATE(dl.FISCAL_YEAR || '/01', 'yyyy/MM')) + 0.99999) AS MONTH1_USED
+				, (SELECT NVL(SUM(CASE WHEN RES_KEY IN ('1510758010','1510624002','1510589277','1510582125','1510578484','1510407122') THEN PRICE ELSE PRICE*90/100 END), 0) FROM DLOAN_REQ_TBL WHERE STORE_ID = dls.STORE_ID AND REQ_STATUS IS NOT NULL AND REQ_STATUS NOT IN ('U02','S02','L02','S08','S09') AND REQ_DATE BETWEEN TRUNC(TO_DATE(dl.FISCAL_YEAR || '/02', 'yyyy/MM')) and LAST_DAY(TO_DATE(dl.FISCAL_YEAR || '/02', 'yyyy/MM')) + 0.99999) AS MONTH2_USED
+				, (SELECT NVL(SUM(CASE WHEN RES_KEY IN ('1510758010','1510624002','1510589277','1510582125','1510578484','1510407122') THEN PRICE ELSE PRICE*90/100 END), 0) FROM DLOAN_REQ_TBL WHERE STORE_ID = dls.STORE_ID AND REQ_STATUS IS NOT NULL AND REQ_STATUS NOT IN ('U02','S02','L02','S08','S09') AND REQ_DATE BETWEEN TRUNC(TO_DATE(dl.FISCAL_YEAR || '/03', 'yyyy/MM')) and LAST_DAY(TO_DATE(dl.FISCAL_YEAR || '/03', 'yyyy/MM')) + 0.99999) AS MONTH3_USED
+				, (SELECT NVL(SUM(CASE WHEN RES_KEY IN ('1510758010','1510624002','1510589277','1510582125','1510578484','1510407122') THEN PRICE ELSE PRICE*90/100 END), 0) FROM DLOAN_REQ_TBL WHERE STORE_ID = dls.STORE_ID AND REQ_STATUS IS NOT NULL AND REQ_STATUS NOT IN ('U02','S02','L02','S08','S09') AND REQ_DATE BETWEEN TRUNC(TO_DATE(dl.FISCAL_YEAR || '/04', 'yyyy/MM')) and LAST_DAY(TO_DATE(dl.FISCAL_YEAR || '/04', 'yyyy/MM')) + 0.99999) AS MONTH4_USED
+				, (SELECT NVL(SUM(CASE WHEN RES_KEY IN ('1510758010','1510624002','1510589277','1510582125','1510578484','1510407122') THEN PRICE ELSE PRICE*90/100 END), 0) FROM DLOAN_REQ_TBL WHERE STORE_ID = dls.STORE_ID AND REQ_STATUS IS NOT NULL AND REQ_STATUS NOT IN ('U02','S02','L02','S08','S09') AND REQ_DATE BETWEEN TRUNC(TO_DATE(dl.FISCAL_YEAR || '/05', 'yyyy/MM')) and LAST_DAY(TO_DATE(dl.FISCAL_YEAR || '/05', 'yyyy/MM')) + 0.99999) AS MONTH5_USED
+				, (SELECT NVL(SUM(CASE WHEN RES_KEY IN ('1510758010','1510624002','1510589277','1510582125','1510578484','1510407122') THEN PRICE ELSE PRICE*90/100 END), 0) FROM DLOAN_REQ_TBL WHERE STORE_ID = dls.STORE_ID AND REQ_STATUS IS NOT NULL AND REQ_STATUS NOT IN ('U02','S02','L02','S08','S09') AND REQ_DATE BETWEEN TRUNC(TO_DATE(dl.FISCAL_YEAR || '/06', 'yyyy/MM')) and LAST_DAY(TO_DATE(dl.FISCAL_YEAR || '/06', 'yyyy/MM')) + 0.99999) AS MONTH6_USED
+				, (SELECT NVL(SUM(CASE WHEN RES_KEY IN ('1510758010','1510624002','1510589277','1510582125','1510578484','1510407122') THEN PRICE ELSE PRICE*90/100 END), 0) FROM DLOAN_REQ_TBL WHERE STORE_ID = dls.STORE_ID AND REQ_STATUS IS NOT NULL AND REQ_STATUS NOT IN ('U02','S02','L02','S08','S09') AND REQ_DATE BETWEEN TRUNC(TO_DATE(dl.FISCAL_YEAR || '/07', 'yyyy/MM')) and LAST_DAY(TO_DATE(dl.FISCAL_YEAR || '/07', 'yyyy/MM')) + 0.99999) AS MONTH7_USED
+				, (SELECT NVL(SUM(CASE WHEN RES_KEY IN ('1510758010','1510624002','1510589277','1510582125','1510578484','1510407122') THEN PRICE ELSE PRICE*90/100 END), 0) FROM DLOAN_REQ_TBL WHERE STORE_ID = dls.STORE_ID AND REQ_STATUS IS NOT NULL AND REQ_STATUS NOT IN ('U02','S02','L02','S08','S09') AND REQ_DATE BETWEEN TRUNC(TO_DATE(dl.FISCAL_YEAR || '/08', 'yyyy/MM')) and LAST_DAY(TO_DATE(dl.FISCAL_YEAR || '/08', 'yyyy/MM')) + 0.99999) AS MONTH8_USED
+				, (SELECT NVL(SUM(CASE WHEN RES_KEY IN ('1510758010','1510624002','1510589277','1510582125','1510578484','1510407122') THEN PRICE ELSE PRICE*90/100 END), 0) FROM DLOAN_REQ_TBL WHERE STORE_ID = dls.STORE_ID AND REQ_STATUS IS NOT NULL AND REQ_STATUS NOT IN ('U02','S02','L02','S08','S09') AND REQ_DATE BETWEEN TRUNC(TO_DATE(dl.FISCAL_YEAR || '/09', 'yyyy/MM')) and LAST_DAY(TO_DATE(dl.FISCAL_YEAR || '/09', 'yyyy/MM')) + 0.99999) AS MONTH9_USED
+				, (SELECT NVL(SUM(CASE WHEN RES_KEY IN ('1510758010','1510624002','1510589277','1510582125','1510578484','1510407122') THEN PRICE ELSE PRICE*90/100 END), 0) FROM DLOAN_REQ_TBL WHERE STORE_ID = dls.STORE_ID AND REQ_STATUS IS NOT NULL AND REQ_STATUS NOT IN ('U02','S02','L02','S08','S09') AND REQ_DATE BETWEEN TRUNC(TO_DATE(dl.FISCAL_YEAR || '/10', 'yyyy/MM')) and LAST_DAY(TO_DATE(dl.FISCAL_YEAR || '/10', 'yyyy/MM')) + 0.99999) AS MONTH10_USED
+				, (SELECT NVL(SUM(CASE WHEN RES_KEY IN ('1510758010','1510624002','1510589277','1510582125','1510578484','1510407122') THEN PRICE ELSE PRICE*90/100 END), 0) FROM DLOAN_REQ_TBL WHERE STORE_ID = dls.STORE_ID AND REQ_STATUS IS NOT NULL AND REQ_STATUS NOT IN ('U02','S02','L02','S08','S09') AND REQ_DATE BETWEEN TRUNC(TO_DATE(dl.FISCAL_YEAR || '/11', 'yyyy/MM')) and LAST_DAY(TO_DATE(dl.FISCAL_YEAR || '/11', 'yyyy/MM')) + 0.99999) AS MONTH11_USED
+				, (SELECT NVL(SUM(CASE WHEN RES_KEY IN ('1510758010','1510624002','1510589277','1510582125','1510578484','1510407122') THEN PRICE ELSE PRICE*90/100 END), 0) FROM DLOAN_REQ_TBL WHERE STORE_ID = dls.STORE_ID AND REQ_STATUS IS NOT NULL AND REQ_STATUS NOT IN ('U02','S02','L02','S08','S09') AND REQ_DATE BETWEEN TRUNC(TO_DATE(dl.FISCAL_YEAR || '/12', 'yyyy/MM')) and LAST_DAY(TO_DATE(dl.FISCAL_YEAR || '/12', 'yyyy/MM')) + 0.99999) AS MONTH12_USED
+			FROM DLOAN_LIB_SPENDING_TBL dl, DLOAN_LIB_SPENDING_INFO_TBL dls
+			WHERE
+				dl.REC_KEY = dls.PARENT_KEY
+				AND dl.REC_KEY = #{parentKey}
+				AND dls.STORE_ID = #{storeId})
+		WHERE ROWNUM = 1
+	</select>
+</mapper>

@@ -33,6 +33,7 @@ public class StoreResService {
 	public Map<String, Object> selectReqeustList(Map<String, String> params) {	
 		
 		Map<String, Object> retMap     = ValidUtils.resultSuccessMap();
+		params.put("storeYn",SessionUtils.getStoreYn());
 		List<Map<String, Object>> list = (List<Map<String, Object>>) commonDao.selectList(NAME_SPACE.concat("selectRequestList"), params);
 		
 		retMap.put("resultList", list);

@@ -14,6 +14,8 @@ var libRequest = {
 		});
 
 		comm.sort.initSort('requestInfo');
+		libcomm.headerCheck();
+		libRequest.useBtnYn();
 	},
 	
 	events : function () {
@@ -407,7 +409,18 @@ var libRequest = {
 	
 	changePopClose : function() {
 		$("#libChangePop").hide();
-	}, 
+	},
+
+	useBtnYn : function (){
+		if(comm.getViewOptionData_value('007','ALL') === 'Y'){
+			$('#btnReqReturn').show();
+		}
+
+		if(comm.getViewOptionData_value('008','ALL') === 'Y'){
+			$('#btnReqStatusS04').show();
+		}
+
+	}
 };
 
 var smsSendPop = {

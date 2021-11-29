@@ -53,51 +53,53 @@
 		
 			<!-- 목록 -->
 			<div class="result_list_del">
-				<table class="result_table" id="responseInfo">
-					<colgroup>
-						<col width="90px">
-						<col width="130px;">
-						<col width="150px;">
-						<col width="190px">
-						<col width="180px">
-						<col width="145px">
-						<col width="125px">
-					</colgroup>
-					<thead>
-						<tr>
-							<th>No.</th>
-							<th><a href="javascript:;" onclick="comm.sort.sortOrder(this, libResponse.search);" data-sort="LIB_MANAGE_NAME">납품<br>도서관</a></th>
-							<th><a href="javascript:;" onclick="comm.sort.sortOrder(this, libResponse.search);" data-sort="STORE_NAME">납품서점</a></th>
-							<th><a href="javascript:;" onclick="comm.sort.sortOrder(this, libResponse.search);" data-sort="RES_TITLE">납품명</a></th>
-							<th><a href="javascript:;" onclick="comm.sort.sortOrder(this, libResponse.search);" data-sort="RES_DATE">납품요청일</a></th>
-							<th><a href="javascript:;" onclick="comm.sort.sortOrder(this, libResponse.search);" data-sort="BOOK_COUNT">납품도서수</a></th>
-							<th><a href="javascript:;" onclick="comm.sort.sortOrder(this, libResponse.search);" data-sort="RES_STATUS">진행상태</a></th>
-						</tr>
-					</thead>
-					<tbody>
-						<c:choose>
-							<c:when test="${fn:length(resultList) > 0}">
-								<c:forEach var="row" items="${resultList}" varStatus="status">
+				<div class="result_list_wrapper">
+					<table class="result_table" id="responseInfo">
+						<colgroup>
+							<col width="90px">
+							<col width="130px;">
+							<col width="150px;">
+							<col width="190px">
+							<col width="180px">
+							<col width="145px">
+							<col width="125px">
+						</colgroup>
+						<thead>
+							<tr>
+								<th>No.</th>
+								<th><a href="javascript:;" onclick="comm.sort.sortOrder(this, libResponse.search);" data-sort="LIB_MANAGE_NAME">납품<br>도서관</a></th>
+								<th><a href="javascript:;" onclick="comm.sort.sortOrder(this, libResponse.search);" data-sort="STORE_NAME">납품서점</a></th>
+								<th><a href="javascript:;" onclick="comm.sort.sortOrder(this, libResponse.search);" data-sort="RES_TITLE">납품명</a></th>
+								<th><a href="javascript:;" onclick="comm.sort.sortOrder(this, libResponse.search);" data-sort="RES_DATE">납품요청일</a></th>
+								<th><a href="javascript:;" onclick="comm.sort.sortOrder(this, libResponse.search);" data-sort="BOOK_COUNT">납품도서수</a></th>
+								<th><a href="javascript:;" onclick="comm.sort.sortOrder(this, libResponse.search);" data-sort="RES_STATUS">진행상태</a></th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:choose>
+								<c:when test="${fn:length(resultList) > 0}">
+									<c:forEach var="row" items="${resultList}" varStatus="status">
+										<tr>
+											<input type="hidden" name="recKey" value="${row.recKey }" />
+											<td>${row.rnum}</td>
+											<td>${row.libManageName}</td>
+											<td>${row.storeName}</td>
+											<td style="text-align:left;"><a href="javascript:;" onclick="javascript:document.location.href='${ctx}/lib/libResponseInfoDetail?resKey=${row.recKey}';">${row.resTitle}</a></td>
+											<td><fmt:formatDate value="${row.resDate}" pattern="yyyy-MM-dd"/></td>
+											<td>${row.bookCount}</td>
+											<td>${row.resStatusName}</td>
+										</tr>
+									</c:forEach>
+								</c:when>
+								<c:otherwise>
 									<tr>
-										<input type="hidden" name="recKey" value="${row.recKey }" />
-										<td>${row.rnum}</td>
-										<td>${row.libManageName}</td>
-										<td>${row.storeName}</td>
-										<td style="text-align:left;"><a href="javascript:;" onclick="javascript:document.location.href='${ctx}/lib/libResponseInfoDetail?resKey=${row.recKey}';">${row.resTitle}</a></td>
-										<td><fmt:formatDate value="${row.resDate}" pattern="yyyy-MM-dd"/></td>
-										<td>${row.bookCount}</td>
-										<td>${row.resStatusName}</td>
+										<td colspan="7" style="text-align: center;">조회된 결과가 없습니다.</td>
 									</tr>
-								</c:forEach>
-							</c:when>
-							<c:otherwise>
-								<tr>
-									<td colspan="7" style="text-align: center;">조회된 결과가 없습니다.</td>
-								</tr>
-							</c:otherwise>
-						</c:choose>
-					</tbody>
-				</table>
+								</c:otherwise>
+							</c:choose>
+						</tbody>
+					</table>
+				</div>
 				<c:if test="${not empty pageInfo}">
 					<div style="text-align: center;">
 						<kaitUi:paging pageInfo='${pageInfo}'  jsFunction="libResponse.search" />

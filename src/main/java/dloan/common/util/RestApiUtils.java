@@ -21,11 +21,11 @@ public class RestApiUtils {
 	private String aladinApiUrl;
 	
 	public RestApiUtils(
-			@Value("#{conf['naver_api_key']}"    ) String naverApiKey,
-			@Value("#{conf['naver_api_secret']}" ) String naverApiSecret,
 			@Value("#{conf['aladin_api_ttbkey']}") String aladinApiTtbkey
 			) {
-		
+		String naverApiKey = System.getProperty("naver_api_key");
+		String naverApiSecret = System.getProperty("naver_api_secret");
+
 		this.naverApiIdx        = -1;
 		this.naverApiKeyList    = naverApiKey.split(",");
 		this.naverApiSecretList = naverApiSecret.split(",");

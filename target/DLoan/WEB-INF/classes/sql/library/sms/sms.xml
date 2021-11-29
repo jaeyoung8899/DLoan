@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="library.sms">
+	<select id="selectSms" parameterType="Map" resultType="camelMap">
+		<include refid="common.pagingPre" />
+		SELECT
+			ROW_NUMBER() OVER (ORDER BY 
+			<choose>
+				<when test='sortCol == "USER_NAME" and order =="ASC"'>
+					NAME ASC
+				</when>
+				<when test='sortCol == "USER_NAME" and order =="DESC"'>
+					NAME DESC
+				</when>
+				<when test='sortCol == "USER_NO" and order =="ASC"'>
+					USER_NO ASC
+				</when>
+				<when test='sortCol == "USER_NO" and order =="DESC"'>
+					USER_NO DESC
+				</when>
+				<when test='sortCol == "SEND_PHONE" and order =="ASC"'>
+					SEND_PHONE ASC
+				</when>
+				<when test='sortCol == "SEND_PHONE" and order =="DESC"'>
+					SEND_PHONE DESC
+				</when>
+				<when test='sortCol == "MSG" and order =="ASC"'>
+					SEND_MESSAGE ASC
+				</when>
+				<when test='sortCol == "MSG" and order =="DESC"'>
+					SEND_MESSAGE DESC
+				</when>
+				<when test='sortCol == "SEND_TIME" and order =="ASC"'>
+					SEND_TIME ASC
+				</when>
+				<when test='sortCol == "SEND_TIME" and order =="DESC"'>
+					SEND_TIME DESC
+				</when>
+				<when test='sortCol == "SUCCESS_YN" and order =="ASC"'>
+					SEND_TIME ASC
+				</when>
+				<when test='sortCol == "SUCCESS_YN" and order =="DESC"'>
+					SEND_SUCCESS_YN DESC
+				</when>
+				<otherwise>
+					SEND_TIME DESC
+				</otherwise>
+			</choose>
+			) RNUM,
+			MAIN.*
+		FROM
+			(SELECT
+				MSLT.REC_KEY
+				, CLUT.USER_NO
+				, MSLT.NAME
+				, SEND_PHONE_NUMBER AS SEND_PHONE
+				, SEND_MESSAGE
+				, TO_CHAR(SEND_TIME, 'yyyy/MM/dd HH24:MI:SS') AS SEND_TIME
+				, SEND_SUCCESS_YN
+			FROM
+				MN_SMS_LOG_TBL MSLT
+			LEFT JOIN
+				CO_LOAN_USER_TBL CLUT
+			ON
+				MSLT.USER_KEY = CLUT.REC_KEY
+			<where>
+				SMS_TYPE = 'DLO01'
+				<if test="selLibManageCode != null and !selLibManageCode.equals('')">
+					AND MSLT.MANAGE_CODE = #{selLibManageCode}
+				</if>
+				<choose>
+					<when test="from_reqDate != null and to_reqDate != null and !from_reqDate.equals('') and !to_reqDate.equals('')">
+						AND SEND_TIME BETWEEN TRUNC(TO_DATE(#{from_reqDate})) AND TRUNC(TO_DATE(#{to_reqDate})) + 0.99999
+					</when>
+					<when test="from_reqDate != null and !from_reqDate.equals('')">
+						AND SEND_TIME &gt;= TRUNC(TO_DATE(#{from_reqDate}))
+					</when>
+					<when test="to_reqDate != null and !to_reqDate.equals('')">
+						AND SEND_TIME &lt;= TRUNC(TO_DATE(#{to_reqDate})) + 0.99999
+					</when>
+				</choose>
+				<if test="userNo != null and !userNo.equals('')">
+					AND CLUT.USER_NO = #{userNo}
+				</if>
+				<if test="userName != null and !userName.equals('')">
+					AND MSLT.NAME = #{userName}
+				</if>
+				<if test="sendPhone != null and !sendPhone.equals('')">
+					AND SEND_PHONE_NUMBER LIKE '%' || #{sendPhone} || '%'
+				</if>
+				<if test="sendMessage != null and !sendMessage.equals('')">
+					AND SEND_MESSAGE LIKE '%' || #{sendMessage} || '%'
+				</if>
+			</where>
+			) MAIN
+		<include refid="common.pagingPost" />
+	</select>
+</mapper>

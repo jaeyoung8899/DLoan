@@ -46,13 +46,22 @@ public class StoreRequestController {
 	/**
 	 * 신청 조회
 	 * 
-	 * @param req
+	 * @param params
 	 * @return
 	 * @throws Exception 
 	 */
 	@RequestMapping(value="/storeRequestInfo")
 	public ModelAndView storeRequestInfo(@RequestParam Map<String, String> params) throws Exception {
-		ModelAndView mv = new ModelAndView("store/request/storeRequest");
+
+		String pageName = "";
+		String storeYn = SessionUtils.getStoreYn();
+		if(storeYn != null &&storeYn.equals("Y")) {
+			pageName = "store/request/storeRequestReturn";
+		}else{
+			pageName = "store/request/storeRequest";
+		}
+
+		ModelAndView mv = new ModelAndView(pageName);
 
 		// 디폴트 검색조건 (현재일자)
 		// 2019 간담회 개선 : 디폴트 검색조건 삭제

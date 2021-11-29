@@ -82,7 +82,7 @@
 				</tbody>
 				</table>
 			</section>
-			<div class="btn_wrap">
+			<div class="btn_wrap" style="width: 97%">
 				<input type="button" class="btn_search" value="저장" id="btnSave">
 			</div>
 		</section>

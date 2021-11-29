@@ -121,10 +121,11 @@ public class LibResController {
 	public @ResponseBody Map<String, Object> saveLibApprove(
 			@RequestParam(name="ltRecKey",    required=false)  List<String> ltRecKey,
 			@RequestParam(name="ltResStatus", required=false)  List<String> ltResStatus,
+			@RequestParam(name="ltReturnBookReason",required=false)  List<String>  ltReturnBookReason,
 			@RequestParam(name="resKey",      required=false)  String resKey
 			) throws Exception {
 		
-		return libResService.saveLibApprove(ltRecKey, ltResStatus, resKey);
+		return libResService.saveLibApprove(ltRecKey, ltResStatus, resKey,ltReturnBookReason);
 	}
 	
 	/**

@@ -44,7 +44,16 @@ public class ReturnLoanController {
 	 */
 	@RequestMapping(value="/returnLoanInfo")
 	public ModelAndView storeRequestInfo(@RequestParam Map<String, String> params) throws Exception {
-		ModelAndView mv = new ModelAndView("store/returnloan/returnLoan");
+
+		String pageName = "";
+		String storeYn = SessionUtils.getStoreYn();
+		if(storeYn !=null && storeYn.equals("Y")) {
+			pageName = "store/returnloan/returnLoanReturn";
+		}else{
+			pageName = "store/returnloan/returnLoan";
+		}
+
+		ModelAndView mv = new ModelAndView(pageName);
 
 		params.put("storeId", SessionUtils.getStoreId());
 		mv.addAllObjects(params);

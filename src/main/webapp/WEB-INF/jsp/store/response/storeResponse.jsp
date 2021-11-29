@@ -9,9 +9,17 @@
 <link rel="stylesheet" href="<c:url value="/resources/store/css/01_header_footer_common.css?v=${cssver}" />" type="text/css" title="no title" charset="utf-8"/>
 <link rel="stylesheet" href="<c:url value="/resources/store/css/03_content.css?v=${cssver}" />" type="text/css" title="no title" charset="utf-8"/>
 </head>
+
 <body>
 
-	<%@ include file="/WEB-INF/jsp/common/storeHeader.jsp"%>
+	<c:choose>
+		<c:when test="${storeYn eq 'Y'}">
+			<%@ include file="/WEB-INF/jsp/common/storeHeaderReturn.jsp"%>
+		</c:when>
+		<c:otherwise>
+			<%@ include file="/WEB-INF/jsp/common/storeHeader.jsp"%>
+		</c:otherwise>
+	</c:choose>
 
 	<div class="content">
 
@@ -53,72 +61,75 @@
 		
 		<!-- 목록 -->
 			<div class="result_list_del">
-				<table class="result_table" id="responseInfo">
-					<colgroup>
-						<col width="90px">
-						<col width="90px">
-						<col width="180px;">
-						<col width="190px">
-						<col width="180px">
-						<col width="145px">
-						<col width="125px">
-					</colgroup>
-					<thead>
-						<tr>
-							<th style="text-align: center;">No.</th>
-							<th style="text-align: center;">
-								<input type="checkbox" id="check_all" class="check" data-name="chkNm" onchange="storeResponse.checkedAll(this, 'responseInfo');">
-								<label for="check_all" class="check_wrap" ></label>
-							</th>
-							<th style="text-align: center;"><a href="javascript:;" onclick="comm.sort.sortOrder(this, storeResponse.search);" data-sort="LIB_MANAGE_NAME">납품<br>도서관</a></th>
-							<th style="text-align: center;"><a href="javascript:;" onclick="comm.sort.sortOrder(this, storeResponse.search);" data-sort="RES_TITLE">납품명</a></th>
-							<th style="text-align: center;"><a href="javascript:;" onclick="comm.sort.sortOrder(this, storeResponse.search);" data-sort="RES_DATE">납품요청일</a></th>
-							<th style="text-align: center;"><a href="javascript:;" onclick="comm.sort.sortOrder(this, storeResponse.search);" data-sort="BOOK_COUNT">납품도서수</a></th>
-							
-							<th style="text-align: center;"><a href="javascript:;" onclick="comm.sort.sortOrder(this, storeResponse.search);" data-sort="RES_STATUS_NAME">진행상태</a></th>
-						</tr>
-					</thead>
-					<tbody>
-						<c:choose>
-							<c:when test="${fn:length(resultList) > 0}">
-								<c:forEach var="row" items="${resultList}" varStatus="status">
+				<div class="result_list_wrapper">
+					<table class="result_table" id="responseInfo" style="min-width:1000px">
+						<colgroup>
+							<col width="50px">
+							<col width="50px">
+							<col width="200px">
+							<col>
+							<col width="100px">
+							<col width="100px">
+							<col width="100px">
+						</colgroup>
+						<thead>
+							<tr>
+								<th style="text-align: center;">No.</th>
+								<th style="text-align: center;">
+									<input type="checkbox" id="check_all" class="check" data-name="chkNm" onchange="storeResponse.checkedAll(this, 'responseInfo');">
+									<label for="check_all" class="check_wrap" ></label>
+								</th>
+								<th style="text-align: center;"><a href="javascript:;" onclick="comm.sort.sortOrder(this, storeResponse.search);" data-sort="LIB_MANAGE_NAME">납품<br>도서관</a></th>
+								<th style="text-align: center;"><a href="javascript:;" onclick="comm.sort.sortOrder(this, storeResponse.search);" data-sort="RES_TITLE">납품명</a></th>
+								<th style="text-align: center;"><a href="javascript:;" onclick="comm.sort.sortOrder(this, storeResponse.search);" data-sort="RES_DATE">납품요청일</a></th>
+								<th style="text-align: center;"><a href="javascript:;" onclick="comm.sort.sortOrder(this, storeResponse.search);" data-sort="BOOK_COUNT">납품도서수</a></th>
+
+								<th style="text-align: center;"><a href="javascript:;" onclick="comm.sort.sortOrder(this, storeResponse.search);" data-sort="RES_STATUS_NAME">진행상태</a></th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:choose>
+								<c:when test="${fn:length(resultList) > 0}">
+									<c:forEach var="row" items="${resultList}" varStatus="status">
+										<tr>
+											<input type="hidden" name="recKey" value="${row.recKey }"  />
+											<td>${row.rnum}</td>
+											<td>
+												<input type="checkbox" id="check_${row.rnum}"  name="chkNm" class="check" value="${row.resStatus }">
+												<label for="check_${row.rnum}" class="check_wrap"></label>
+											</td>
+											<td>${row.libManageName}</td>
+											<td style="text-align:left;"><a href="javascript:;" onclick="javascript:document.location.href='${ctx}/store/stroeResponseInfoDetail?resKey=${row.recKey}';">${row.resTitle}</a></td>
+											<td><fmt:formatDate value="${row.resDate}" pattern="yyyy-MM-dd"/></td>
+											<td>${row.bookCount}</td>
+											<td>${row.resStatusName}</td>
+										</tr>
+									</c:forEach>
+								</c:when>
+								<c:otherwise>
 									<tr>
-										<input type="hidden" name="recKey" value="${row.recKey }"  />
-										<td>${row.rnum}</td>
-										<td>
-											<input type="checkbox" id="check_${row.rnum}"  name="chkNm" class="check" value="${row.resStatus }">
-											<label for="check_${row.rnum}" class="check_wrap"></label>
-										</td>
-										<td>${row.libManageName}</td>
-										<td style="text-align:left;"><a href="javascript:;" onclick="javascript:document.location.href='${ctx}/store/stroeResponseInfoDetail?resKey=${row.recKey}';">${row.resTitle}</a></td>
-										<td><fmt:formatDate value="${row.resDate}" pattern="yyyy-MM-dd"/></td>
-										<td>${row.bookCount}</td>
-										<td>${row.resStatusName}</td>
+										<td colspan="7" style="text-align: center;">조회된 결과가 없습니다.</td>
 									</tr>
-								</c:forEach>
-							</c:when>
-							<c:otherwise>
-								<tr>
-									<td colspan="7" style="text-align: center;">조회된 결과가 없습니다.</td>
-								</tr>
-							</c:otherwise>
-						</c:choose>
-					</tbody>
-				</table>
+								</c:otherwise>
+							</c:choose>
+						</tbody>
+					</table>
+				</div>
 				<div class="btn_extra">
 					<input type="button" class="btn_approve" id="btnWindowPrint" value="인쇄">
 					<input type="button" class="btn_sms" id="btnExcelDown" value="엑셀다운로드">
 				</div>
-				<div class="btn_wrap">
-					<input type="button" class="btn_complete" id="btnComplate" value="납품완료">
-				</div>
-				<c:if test="${not empty pageInfo}">
-				<div style="text-align: center;">
-					<kaitUi:paging pageInfo='${pageInfo}'  jsFunction="storeResponse.search" />
-				</div>
-				</c:if>
-				
 			</div>
+			<div class="btn_wrap">
+				<input type="button" class="btn_complete" id="btnComplate" value="납품완료">
+			</div>
+			<c:if test="${not empty pageInfo}">
+			<div style="text-align: center;">
+				<kaitUi:paging pageInfo='${pageInfo}'  jsFunction="storeResponse.search" />
+			</div>
+			</c:if>
+				
+
 		</section>
 	</div>
 	

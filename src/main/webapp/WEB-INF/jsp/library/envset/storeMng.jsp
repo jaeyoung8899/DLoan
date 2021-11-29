@@ -48,7 +48,8 @@
 									<td>${row.storeId}</td>
 									
 									<td><input type="text" name="storePhone" maxlength="11" value="${row.storePhone}" style="width:100%; height:30px"></td>
-									<td><input type="button" class="btn_add" style="width:100px" value="전화번호변경" onclick="storeMng.popChgPhone('${row.storeId}')"></td>
+									<td><input type="text" name="handphone" maxlength="11" value="${row.handphone}" style="width:100%; height:30px"></td>
+<%--									<td><input type="button" class="btn_add" style="width:100px" value="전화번호변경" onclick="storeMng.popChgPhone('${row.storeId}')"></td>--%>
 									<td><input type="text" name="limitPrice" maxlength="11" value="${row.limitPrice}" style="width:100%; height:30px"></td>
 									<td><input type="button" class="btn_add" style="width:100px" value="서점MAC변경" onclick="storeMng.popChgMAC('${row.storeId}')"></td>
 									<td><input type="button" class="btn_add" style="width:100px" value="비밀번호변경" onclick="storeMng.popChgPasswd('${row.storeId}')"></td>
@@ -69,7 +70,7 @@
 				</tbody>
 				</table>
 			</section>
-			<div class="btn_wrap">
+			<div class="btn_wrap" style="width:97%">
 				<input type="button" class="btn_search" value="저장" id="btnSave">
 			</div>
 		</section>

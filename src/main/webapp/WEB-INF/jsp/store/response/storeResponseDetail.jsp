@@ -12,7 +12,14 @@
 </head>
 <body>
 
-	<%@ include file="/WEB-INF/jsp/common/storeHeader.jsp"%>
+	<c:choose>
+		<c:when test="${storeYn eq 'Y'}">
+			<%@ include file="/WEB-INF/jsp/common/storeHeaderReturn.jsp"%>
+		</c:when>
+		<c:otherwise>
+			<%@ include file="/WEB-INF/jsp/common/storeHeader.jsp"%>
+		</c:otherwise>
+	</c:choose>
 
 	<div class="content">
 
@@ -86,81 +93,94 @@
 					</div>
 				
 				<p class="table_name">납품도서목록</p>
-					
-				<table class="result_table" id="detailInfo" >
+
+				<table class="result_table" id="detailInfo" style="min-width:1000px">
 					<colgroup>
 						<col width="40px">
 						<col width="40px">
-						<col width="140px;">
-						<col width="180px">
-						<col width="120px">
+						<col width="140px">
+						<col >
 						<col width="130px">
+						<col width="150px">
+						<col width="70px">
 						<col width="70px">
 						<col width="80px">
-						<col width="125px">
 						<col width="100px">
-						<col width="100px">
+						<col width="80px">
+						<col width="80px">
+						<col >
 					</colgroup>
 					<thead>
-						<tr>
-							<th>번호</th>
-							<th>
-								<input type="checkbox" id="check_all" class="check" data-name="chkNm" onchange="storeResponseDetail.checkedAll(this, 'detailInfo');">
-								<label for="check_all" class="check_wrap" ></label>
-							</th>
-							<th>대출자번호</th>
-							<th>도서명</th>
-							<th>저자명</th>
-							<th>출판사</th>
-							<th>출판년도</th>
-							<th>정가[가격]</th>
-							<th>신청일</th>
-							<th>진행상태</th>
-							<th>납품상태</th>
-						</tr>
+					<tr>
+						<th>번호</th>
+						<th>
+							<input type="checkbox" id="check_all" class="check" data-name="chkNm" onchange="storeResponseDetail.checkedAll(this, 'detailInfo');">
+							<label for="check_all" class="check_wrap" ></label>
+						</th>
+						<th>대출자번호</th>
+						<th>도서명</th>
+						<th>저자명</th>
+						<th>출판사</th>
+						<th>출판년도</th>
+						<th>정가[가격]</th>
+						<th>납품금액</th>
+						<th>신청일</th>
+						<th>진행상태</th>
+						<th>납품상태</th>
+						<th>반품사유</th>
+					</tr>
 					</thead>
 					<tbody>
-						<c:choose>
-							<c:when test="${fn:length(resultList) > 0}">
-								<c:forEach var="row" items="${resultList}" varStatus="status">
-									<tr>
-										<input type="hidden" name="recKey" value="${row.recKey }"  />
-										<input type="hidden" name="tResKey" value="${row.resKey }"  />
-										
-										<td>${row.rnum}</td>
-										<td>
-											<input type="checkbox" id="check_${row.rnum}"  name="chkNm" class="check" >
-											<label for="check_${row.rnum}" class="check_wrap"></label>
-										</td>
-										<td>${row.userNo}</td>
-										<td style="text-align:left;">${row.title}</td>
-										<td>${row.author}</td>
-										<td>${row.publisher}</td>
-										<td>
-											<c:if test="${row.pubDate ne null}">
-												${fn:substring(row.pubDate, 0, 4)}
-											</c:if>
-										</td>
-										<td>${row.price}</td>
-										<td>${row.reqDate}</td>
-										<td>${row.reqStatusName}</td>
-										<c:choose>
-											<c:when test="${row.resStatus eq 'L02'}">
-										<td><span style="color: red;">${row.resStatusName}</span></td>
-											</c:when>
-											<c:otherwise>
-										<td>${row.resStatusName}</td>
-											</c:otherwise>
-										</c:choose>
-									</tr>
-								</c:forEach>
-							</c:when>
-							<%-- <c:otherwise>
+					<c:choose>
+						<c:when test="${fn:length(resultList) > 0}">
+							<!--20210901 합계다 -->
+							<c:set var="price_sum" value ="0"/>
+							<c:forEach var="row" items="${resultList}" varStatus="status">
+								<c:if test="${row.resStatus eq 'L01' && resStatus ne 'S01'}">
+									<c:set var="price_sum" value ="${price_sum + row.realPrice}"/>
+								</c:if>
 								<tr>
-									<td colspan="7" style="text-align: center;">조회된 결과가 없습니다.</td>
+									<input type="hidden" name="recKey" value="${row.recKey }"  />
+									<input type="hidden" name="tResKey" value="${row.resKey }"  />
+
+									<td>${row.rnum}</td>
+									<td>
+										<input type="checkbox" id="check_${row.rnum}"  name="chkNm" class="check" >
+										<label for="check_${row.rnum}" class="check_wrap"></label>
+									</td>
+									<td>${row.userNo}</td>
+									<td style="text-align:left;">${row.title}</td>
+									<td>${row.author}</td>
+									<td>${row.publisher}</td>
+									<td>
+										<c:if test="${row.pubDate ne null}">
+											${fn:substring(row.pubDate, 0, 4)}
+										</c:if>
+									</td>
+									<td>${row.price}</td>
+									<td>${row.realPrice}</td>
+									<td>${row.reqDate}</td>
+									<td>${row.reqStatusName}</td>
+									<c:choose>
+										<c:when test="${row.resStatus eq 'L02'}">
+											<td><span style="color: red;">${row.resStatusName}</span></td>
+										</c:when>
+										<c:otherwise>
+											<td>${row.resStatusName}</td>
+										</c:otherwise>
+									</c:choose>
+									<td>${row.resRemark}</td>
 								</tr>
-							</c:otherwise> --%>
-						</c:choose>
+							</c:forEach>
+							<c:if test="${resStatus ne 'S01'}">
+								<tr style="font-weight: bold;">
+									<td colspan="10" >* 구입자료만 합산됩니다.</td>
+									<td>가격합계</td>
+									<td class="font_gulim">\<fmt:formatNumber value="${price_sum}" pattern="###,###,###"/></td>
+								</tr>
+							</c:if>
+						</c:when>
+					</c:choose>
 					</tbody>
 				</table>
 							

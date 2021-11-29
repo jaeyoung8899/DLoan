@@ -37,7 +37,8 @@ public class StoreRequestService {
 	 * @param params
 	 * @return
 	 */
-	public Map<String, Object> selectStoreRequestInfo(Map<String, String> params) {	
+	public Map<String, Object> selectStoreRequestInfo(Map<String, String> params) {
+		params.put("storeYn",SessionUtils.getStoreYn());
 		return (Map<String, Object>) commonDao.selectPagingList(NAME_SPACE.concat("selectStoreRequestInfo"), params);
 	}
 	
@@ -106,23 +107,21 @@ public class StoreRequestService {
 			// SMS수신여부확인
 			// 2019.04.30 간담회 개선 : 도서준비 SMS미발송으로 변경, 도서관확인요청만 SMS 발송
 			// if ("ST02".equals(type) || "Y".equals((String)reqInfo.get("smsYn"))) {
-			if ("ST02".equals(type)) {
+			if ("Y".equals((String)reqInfo.get("smsYn"))) {
 				// SMS양식조회
-				Map<String, String> smsParam = new HashMap<String, String>();
+				Map<String, String> smsParam = new HashMap<>();
 				smsParam.put("autoYn", "Y");
-				smsParam.put("name", "도서관확인요청 (자동발송)");
-				/*
+
 				if ("ST02".equals(type)) {
-					smsParam.put("name", "도서관확인요청 (자동발송)");
+					smsParam.put("smsType", "DLN04");
 				} else {
 					if (StringUtils.isEmpty(enterPlanDate)) {
-						smsParam.put("name", "도서준비 (자동발송)");
+						smsParam.put("smsType", "DLN05");
 					} else {
-						smsParam.put("name", "도서준비-입고예정 (자동발송)");
+						smsParam.put("smsType", "DLN08");
 					}
 				}
-				*/
-				
+
 				String smsMsg = (String) this.commonDao.selectOne("common.getSmsContents", smsParam);
 				if (!StringUtils.isEmpty(smsMsg)) {
 					// 신청자정보조회
@@ -153,6 +152,11 @@ public class StoreRequestService {
 					smsMap.put("msg"          , "{\"type\":\"SM\",\"msg\":\""+tmpMsg+"\"}");
 					smsMap.put("libManageCode", reqInfo.get("libManageCode"));
 					smsMap.put("worker",        "DLOAN-STORE");
+
+					String alimMsg = commonService.convAlimMsg(smsParam,convData);
+					if(!alimMsg.equals("")){
+						smsMap.put("alimMsg",alimMsg);
+					}
 					
 					if (smsMap.get("recever") != null) {
 						smsList.add(smsMap);
@@ -276,15 +280,12 @@ public class StoreRequestService {
 			
 			// 수정된 대출 만료일 재조회
 			Map<String, Object> reqInfo2 = (Map<String, Object>) this.commonDao.selectOne(NAME_SPACE.concat("selectStoreRequest"), recKey);
-			
-			Map<String, Object> alimParam = new HashMap<String, Object>();
-			alimParam.put("smsType", "SMS04");
-			alimParam.put("smsName", "희망도서안내");
-			alimParam.put("useYn", "Y");
-			alimParam.put("manageCode", reqInfo.get("libManageCode").toString());
-			
-			Map<String, Object> alimMap = (Map<String, Object>)this.commonDao.selectOne("common.getAlimContents", alimParam);
-			
+
+			// SMS양식조회
+			Map<String, String> smsParam = new HashMap<String, String>();
+			smsParam.put("smsType",   "DLN06");
+			smsParam.put("autoYn", "Y");
+
 			// SMS수신여부확인
 			if ("Y".equals((String)reqInfo2.get("smsYn"))) {
 				
@@ -294,7 +295,9 @@ public class StoreRequestService {
 		        cal.setTime(date);
 		        cal.add(Calendar.DATE, 7);
 		        String loanWaitDate = df.format(cal.getTime());
-				
+
+
+
 				// SMS자동발송 내역 추가
 				Map<String, Object> smsMap = new HashMap<String, Object>();
 				
@@ -312,16 +315,7 @@ public class StoreRequestService {
 				convData.put("storePhone" , (String) reqInfo2.get("storePhone"));
 				convData.put("libManageName" , (String) reqInfo2.get("libManageName"));
 				String tmpMsg = "";
-				
-				if(alimMap != null && !alimMap.get("TPL_MESSAGE").toString().equals("")) {
-					tmpMsg = this.commonService.convAlimMsg(alimMap.get("TPL_MESSAGE").toString(), convData);
-					smsMap.put("alimKey", alimMap.get("TPL_CODE").toString());
-					smsMap.put("alimMsg"          , tmpMsg);
-				}
-				// SMS양식조회
-				Map<String, String> smsParam = new HashMap<String, String>();
-				smsParam.put("name",   "대출대기 (자동발송)");
-				smsParam.put("autoYn", "Y");
+
 
 				String smsMsg = (String) this.commonDao.selectOne("common.getSmsContents", smsParam);
 				if (!StringUtils.isEmpty(smsMsg)) {
@@ -336,7 +330,12 @@ public class StoreRequestService {
 				smsMap.put("msg"          , "{\"type\":\"SM\",\"msg\":\""+tmpMsg+"\"}");
 				smsMap.put("libManageCode", reqInfo2.get("libManageCode"));
 				smsMap.put("worker",        "DLOAN-STORE");
-				smsMap.put("smsType",       "SMS04");
+				smsMap.put("smsType",       "DLN06");
+
+				String alimMsg = commonService.convAlimMsg(smsParam,convData);
+				if(!alimMsg.equals("")){
+					smsMap.put("alimMsg",alimMsg);
+				}
 
 				if (smsMap.get("recever") != null) {
 					smsList.add(smsMap);
@@ -426,7 +425,7 @@ public class StoreRequestService {
 				if ("Y".equals((String)reqInfo.get("smsYn"))) {
 					// SMS양식조회
 					Map<String, String> smsParam = new HashMap<String, String>();
-					smsParam.put("name",   "서점신청거절 (자동발송)");
+					smsParam.put("smsType",   "DLN02");
 					smsParam.put("autoYn", "Y");
 
 					String smsMsg = (String) this.commonDao.selectOne("common.getSmsContents", smsParam);
@@ -451,6 +450,12 @@ public class StoreRequestService {
 						smsMap.put("libManageCode", reqInfo.get("libManageCode"));
 						smsMap.put("worker",        "DLOAN-STORE");
 						smsMap.put("userName",      user.get("name"));
+						smsMap.put("smsType"  , "DLN02");
+
+						String alimMsg = commonService.convAlimMsg(smsParam,convData);
+						if(!alimMsg.equals("")){
+							smsMap.put("alimMsg",alimMsg);
+						}
 						smsList.add(smsMap);
 					}
 				}

@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import dloan.common.handler.DLoanEnvService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +23,10 @@ public class LoginController {
 
 	@Autowired
 	private LoginService loginService;
-	
+
+	@Autowired
+	private DLoanEnvService dLoanEnvService;
+
 	/**
 	 * login 이동
 	 * 
@@ -32,6 +36,8 @@ public class LoginController {
 	@RequestMapping(value={"", "/", "/login"})
 	public ModelAndView loginPage(HttpServletRequest req, @RequestParam Map<String, String> params) {
 		ModelAndView mv = new ModelAndView("store/login/storeLogin");
+		mv.addObject("viewInfoList",dLoanEnvService.getEtcMap());
+		System.out.println(dLoanEnvService.getEtcMap());
 		mv.addAllObjects(params);
 		return mv;
 	}
@@ -71,6 +77,7 @@ public class LoginController {
 	public ModelAndView libPasswordChange(HttpServletRequest req, @RequestParam Map<String, String> params) {
 
 		ModelAndView mv = new ModelAndView("store/login/storePasswordChange");
+		mv.addObject("storeYn", SessionUtils.getStoreYn());
 		mv.addAllObjects(params);
 		return mv;
 	}

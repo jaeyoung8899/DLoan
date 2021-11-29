@@ -43,7 +43,7 @@ public class StoreResController {
 
 		params.put("storeId", SessionUtils.getStoreId());
 		mv.addAllObjects(params);
-		
+		mv.addObject("storeYn", SessionUtils.getStoreYn());
 		mv.addObject("libList", commonService.selectLibrary(params));
 		mv.addAllObjects(storeResService.selectStoreResponseInfo(params));
 
@@ -65,7 +65,7 @@ public class StoreResController {
 		mv.addAllObjects(params);
 		
 		mv.addObject("libList", commonService.selectLibrary(null));
-		
+		mv.addObject("storeYn", SessionUtils.getStoreYn());
 		if (StringUtils.isNotEmpty(params.get("resKey"))) {
 			mv.addAllObjects(storeResService.selectReqeustList(params));
 			mv.addAllObjects(storeResService.getResopnseInfo(params));
@@ -150,7 +150,7 @@ public class StoreResController {
 				params.put("libManageCode", (String)libList.get(0).get("code"));
 			}
 		}
-		
+		mv.addObject("storeYn", SessionUtils.getStoreYn());
 		mv.addAllObjects(storeResService.selectReqeustList(params));
 
 		return mv;

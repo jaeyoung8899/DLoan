@@ -45,7 +45,7 @@ var storePasswordChange = {
 			url      :  _ctx + '/store/passwordChangeProc',
 			param    : $.param(params, true)
 		};
-		
+		var returnYn = comm.getViewOptionData_value('004','ALL');
 		// 
 		$.commAjax (option, function (result) {
 			if (result.resultCode == "Y") {

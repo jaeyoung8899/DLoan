@@ -12,6 +12,18 @@
 <body>
 <div id="wrap">
 <section class="body">
+	<ul class="tab_wrap" id="reqHeader" style="display: none;">
+		<%
+			String referer = request.getHeader("REFERER");
+			String version = request.getParameter("version");
+		%>
+		<a href="${ctx}/request"><li>희망도서 서비스 신청</li></a>
+
+		<%if (SessionUtils.getUserId() != null ) { %>
+		<a href="${ctx}/myRequestInfo" class="on"><li>신청현황</li></a>
+		<%} %>
+	</ul>
+
 	<div id="body_contents" class="body_contents">
 
 				<div class="tab_button_wrap">

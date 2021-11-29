@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import dloan.common.CommonService;
+import dloan.common.handler.DLoanEnvService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,8 @@ public class LoginService {
 	@Autowired
 	private CommonService commonService;
 
-	
+
+
 	/**
 	 * 회원정보 조회
 	 * 
@@ -52,7 +54,7 @@ public class LoginService {
 		}
 		// 1.암호와 여부
 		String encYn = (String) commonDao.selectOne(NAME_SPACE.concat("getEncryptYn"));
-		
+
 		// 2.사용자 정보 조회
 		Map<String, Object> userInfo = (Map<String, Object>) commonDao.selectOne(NAME_SPACE.concat("getUserInfo"), params.get("userId"));
 		if (userInfo != null) {
@@ -140,8 +142,8 @@ public class LoginService {
 		
 		// 1. 파라미터 확인
 		Map<String, Object> retMap = ValidUtils.requiredMap(params,
-				new String[] {"userName", "userNo"}, 
-				new String[] {"이름", "대출자번호"});
+				new String[] {"userNo"},
+				new String[] {"대출자번호"});
 		if (!retMap.isEmpty()) {
 			return retMap;
 		}
@@ -166,7 +168,15 @@ public class LoginService {
 		if (!params.get("userNo").equals((String) userInfo.get("userNo"))) {
 			return ValidUtils.resultErrorMap("이름과 대출자번호를 확인해주세요.");
 		}
-		
+
+		if(commonService.getViewOptionList().size() > 0) {
+			for(Map<String,Object> map : commonService.getViewOptionList()){
+				if(map.get("CLASS_CODE").equals("001")){
+					SessionUtils.setViewCode(map.get("VALUE").toString());
+				}
+			}
+		}
+
 		// 5. 세션 생성.
 		SessionUtils.setUserInfo(userInfo);
 		return ValidUtils.resultSuccessMap();

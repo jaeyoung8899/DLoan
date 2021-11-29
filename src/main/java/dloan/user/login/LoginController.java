@@ -31,8 +31,7 @@ public class LoginController {
 	@RequestMapping(value="/login")
 	public ModelAndView loginPage(HttpServletRequest req, @RequestParam Map<String, String> params) {
 
-		ModelAndView mv = new ModelAndView("user/login/login");	
-		
+		ModelAndView mv = new ModelAndView("user/login/login");
 		String retUrl  = "/request";
 		String referer = req.getHeader("Referer");
 		String [] uri  = {"request", "myRequestInfo"};

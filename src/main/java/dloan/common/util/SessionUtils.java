@@ -12,11 +12,13 @@ public class SessionUtils {
 	public static final String USER_ID     = "USER_ID";
 	public static final String USER_NM     = "USER_NM";
 	public static final String HANDPHONE   = "HANDPHONE";
+	public static final String VIEW_CODE   = "VIEW_CODE";
 
 	// 서점
 	public static final String STORE_ID    = "STORE_ID";
 	public static final String STORE_NM    = "STORE_NM";
 	public static final String STORE_TEL   = "STORE_TEL";
+	public static final String STORE_YN    = "STORE_YN";
 	
 	// 도서관
 	public static final String LIB_ID      = "LIB_ID";
@@ -53,11 +55,18 @@ public class SessionUtils {
 	public static String getPhone() {
 		return (String) SessionHandler.getAttribute(HANDPHONE);
 	}
-	
+
 	public static void setPhone(String phone) {
 		SessionHandler.setAttribute(HANDPHONE, phone);
 	}
-	
+
+	public static String getViewCode() {
+		return (String) SessionHandler.getAttribute(VIEW_CODE);
+	}
+
+	public static void setViewCode(String viewCode) {
+		SessionHandler.setAttribute(VIEW_CODE, viewCode);
+	}
 	/**
 	 * 사용자 세션
 	 * @param userInfo
@@ -78,6 +87,7 @@ public class SessionUtils {
 		SessionHandler.removeAttribute(USER_ID);
 		SessionHandler.removeAttribute(USER_NM);
 		SessionHandler.removeAttribute(HANDPHONE);
+		SessionHandler.removeAttribute(VIEW_CODE);
 	}
 	
 	public static String getStoreId() {
@@ -104,6 +114,13 @@ public class SessionUtils {
 		SessionHandler.setAttribute(STORE_TEL, storeTel);
 	}
 
+	public static String getStoreYn() {
+		return (String) SessionHandler.getAttribute(STORE_YN);
+	}
+
+	public static void setStoreYn(String storeYn) {
+		SessionHandler.setAttribute(STORE_YN, storeYn);
+	}
 	/**
 	 * 서점 세션
 	 * @param storeInfo
@@ -112,6 +129,8 @@ public class SessionUtils {
 		SessionUtils.setStoreId ((String)storeInfo.get("storeId"));
 		SessionUtils.setStoreNm ((String)storeInfo.get("storeName"));
 		SessionUtils.setStoreTel((String)storeInfo.get("storePhone"));
+		SessionUtils.setStoreYn((String)storeInfo.get("storeYn"));
+
 	}
 	
 	/**
@@ -121,6 +140,8 @@ public class SessionUtils {
 		SessionHandler.removeAttribute(STORE_ID);
 		SessionHandler.removeAttribute(STORE_NM);
 		SessionHandler.removeAttribute(STORE_TEL);
+		SessionHandler.removeAttribute(STORE_YN);
+
 	}
 	
 	public static String getLibMngCd() {

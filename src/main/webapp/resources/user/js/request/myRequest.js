@@ -14,6 +14,12 @@ var myRequest = {
 		});
 		
 		comm.sort.initSort('myRequestInfo');
+
+		//헤더 표시여부
+		var headerYn = comm.getViewOptionData_value('002','ALL');
+		if(headerYn === 'Y') {
+			$('#reqHeader').show();
+		}
 	},
 	
 	

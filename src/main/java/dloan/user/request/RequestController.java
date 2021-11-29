@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import dloan.common.handler.DLoanEnvService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,9 @@ public class RequestController {
 	
 	@Autowired
 	private MapComparator mapComparator;
+
+	@Autowired
+	private DLoanEnvService dLoanEnvService;
 	
 	/**
 	 * 책 조회
@@ -54,15 +58,16 @@ public class RequestController {
 	 */
 	@RequestMapping(value="/request")
 	public ModelAndView bookSearch(HttpServletRequest req, @RequestParam Map<String, String> params) throws Exception {
+
 		if (SessionUtils.getUserId() == null) {
 			// 세션이 없을 경우
 			ModelAndView mv = new ModelAndView("user/request/request");
-			mv.addObject("monthLimit", this.requestService.getMonthLimit());
+//			mv.addObject("monthLimit", this.requestService.getMonthLimit());
 			return mv;
 		}
-		
 		Map<String, Object> retMap = null;
-		
+
+
 		if (StringUtils.isNotEmpty(params.get("d_titl")) ||
 			StringUtils.isNotEmpty(params.get("d_auth")) ||
 			StringUtils.isNotEmpty(params.get("d_publ"))) {
@@ -103,49 +108,15 @@ public class RequestController {
 		}
 		
 		SessionUtils.setUserInfo(this.loginService.getUserInfo(SessionUtils.getUserId()));
+		//세션에 지역정보저장
+		if(StringUtils.isNotEmpty(params.get("viewCode"))){
+			SessionUtils.setViewCode(params.get("viewCode"));
+		}
 		
 		// 도서관 목록 조회
 		List<Map<String, Object>> libraryList = this.commonService.selectLibrary(null);
 		// 오름차순 정렬
 		Collections.sort(libraryList, mapComparator);
-		
-		/**
-		 * 2018-08-27 요청
-		 * 영통, 북수원 도서관 비치희망서비스 신청제한(2018-09-01 ~)
-		 * 2018-10-18 요청
-		 * 호매실 도서관 비치희망서비스 신청제한(2018-10-22 ~)
-		 * 2018-10-24 요청
-		 * 광교홍재 도서관 비치희망서비스 신청제한(2018-10-29 ~)
-		 * 일월 도서관 비치희망서비스 신청제한(2018-11-01 ~)
-		 * 2018-10-29 요청
-		 * 태장마루 도서관 비치희망서비스 신청제한(2018-11-01 ~)
-		 * 2018-11-02 요청
-		 * 대추골 도서관 비치희망서비스 신청제한(2018-11-03 ~)
-		 * 2018-11-07 요청
-		 * 광교푸른숲 도서관 비치희망서비스 신청제한(2018-11-08 ~)
-		 * 2018-11-22 요청
-		 * 매여울 도서관 비치희망서비스 신청제한(2018-11-22 ~)
-		 * 2018-11-27 요청
-		 * 한림 도서관 비치희망서비스 신청제한(2018-12-01 ~)
-		 * 2018-11-28 요청
-		 * 서수원 도서관 비치희망서비스 신청제한(2018-12-01 ~)
-		 * 2018-11-30 요청
-		 * 버드내 도서관 비치희망서비스 신청제한(2018-12-01 ~)
-		 * 2018-12-04 요청
-		 * 선경, 중앙, 창룡, 화서다산 도서관 비치희망서비스 신청제한(2018-12-04 ~)
-		 * 2018-12-05 요청
-		 * 한아름 도서관 비치희망서비스 신청제한(2018-12-06 ~)
-		 * 2018-12-07 요청
-		 * 슬기샘, 지혜샘, 바른샘 도서관 비치희망서비스 신청제한(2018-12-07 ~)
-		 * 2018-12-20 요청
-		 * 희망샘 도서관 도서관 비치희망서비스 신청제한(2018-12-20 ~)
-		 * 2019-01-07 요청
-		 * 슬기샘, 지혜샘, 바른샘, 한아름, 희망샘 도서관을 제외한 모든 공공도서관 비치희망서비스 오픈(2019-01-07 ~)
-		 * 2019-01-17 요청
-		 * 희망샘 도서관 비치희망서비스 오픈
-		 * 2019-01-31 요청
-		 * 지혜샘, 슬기샘, 바른샘 도서관 비치희망서비스 오픈
-		 */
 		
 		/*List<Map<String, Object>> tempLibraryList = new ArrayList<Map<String, Object>>();
 		
@@ -164,11 +135,11 @@ public class RequestController {
 			libraryList = new ArrayList<Map<String, Object>>();
 			libraryList.addAll(tempLibraryList);
 		}*/
-		
-		ModelAndView mv = new ModelAndView("user/request/request");
+		System.out.println("경로: user/request/view/request"+SessionUtils.getViewCode());
+		ModelAndView mv = new ModelAndView("user/request/view/request"+SessionUtils.getViewCode());
 		mv.addObject("storeList" , this.commonService.selectStore("randomOrder"));
 		mv.addObject("libraryList" , libraryList);
-		mv.addObject("monthLimit", this.requestService.getMonthLimit());
+		mv.addObject("monthLimit", this.dLoanEnvService.getConfTblMap().get("month"));
 		mv.addAllObjects(retMap);
 		return mv;
 	}
@@ -246,8 +217,8 @@ public class RequestController {
 	public @ResponseBody Map<String, Object> insertBookRequest(HttpServletRequest req, 
 			@RequestParam Map<String, String> params) throws Exception {
 		
-		Map<String, Object> rtnMap = new HashMap<String, Object>(); 
-		
+		Map<String, Object> rtnMap = new HashMap<String, Object>();
+
 		String type = params.get("type");
 		if(StringUtils.isEmpty(type)) {
 			rtnMap.put("resultMessage", "올바른 요청이 아닙니다.");
@@ -258,18 +229,20 @@ public class RequestController {
 			rtnMap.put("resultCode",    "N");
 			return rtnMap;
 		}
-		
-		
-			// 바로대출 신청
+
+
+		if(type.equals("bookstore")) {
 			rtnMap = this.requestService.insertRequest(params);
+		} else {
+			rtnMap = this.requestService.insertFurnishRequest(params);
+		}
 		
 		if ("Y".equals(rtnMap.get("resultCode"))) {
 			// SMS발송
 			try {
 				Map<String, Object> smsInfo = (Map<String, Object>) rtnMap.get("smsInfo");
 				if (smsInfo != null) {
-					//this.commonService.smsSend(smsInfo);
-					this.commonService.smsSendRequest(smsInfo);
+					this.commonService.smsSend(smsInfo);
 				}
 			} catch (Exception e) {
 				// 2019.05.07 소스코드 보안취약점 조치
@@ -347,7 +320,7 @@ public class RequestController {
 	@RequestMapping(value="/requestHelp")
 	public ModelAndView requestHelp() {
 		ModelAndView mav = new ModelAndView("user/request/requestHelp");
-		mav.addObject("monthLimit", this.requestService.getMonthLimit());
+		mav.addObject("monthLimit", this.dLoanEnvService.getConfTblMap().get("month"));
 		return mav;
 	}
 	

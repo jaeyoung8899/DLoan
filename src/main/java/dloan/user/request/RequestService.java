@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import dloan.common.handler.DLoanEnvService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,9 +32,9 @@ public class RequestService {
 	private static final String STORE_SPACE = "store.request.";
 	
 	// 서점신청 - 출판년도 제한(미만)
-	private static final int storeRequestPubDatelimit = 1;
+	private static int storeRequestPubDatelimit = 0;
 	// 도서관신청 - 출판년도 제한(미만)
-	private static final int libRequestPubDatelimit = 5;
+	private static int libRequestPubDatelimit = 0;
 	
 	@Autowired
 	protected CommonDao commonDao;
@@ -43,6 +44,9 @@ public class RequestService {
 	
 	@Autowired
 	private CommonService commonService;
+
+	@Autowired
+	private DLoanEnvService dLoanEnvService;
 
 	public Map<String, Object> selectRequestInfo(Map<String, String> params) {	
 		return (Map<String, Object>) commonDao.selectPagingList(USER_SPACE.concat("selectRequestInfo"), params);
@@ -76,11 +80,15 @@ public class RequestService {
 		if (!retMap.isEmpty()) {
 			return retMap;
 		}
-		
+		Map<String,Object> configMap = dLoanEnvService.getConfTblMap();
+		System.out.println(configMap.get("STORE_PUB_LIMIT_YEAR"));
+		storeRequestPubDatelimit = Integer.parseInt(configMap.get("STORE_PUB_LIMIT_YEAR").toString());
+
 		/**********************************************************
 		 *  지역 변수 선언
 		 **********************************************************/
 		params.put("userNo", SessionUtils.getUserNo());
+		params.put("name", SessionUtils.getUserNm());
 		
 		Map<String, Object> tmpMap = null;
 		
@@ -114,9 +122,15 @@ public class RequestService {
 		
 		// 1.3 : 이용자 신청 제한 여부 조회
 		// 1.3.1 : 이용자 신청제한 사용여부 조회
-		String userPenalty = (String) this.commonDao.selectOne("task.".concat("selectUserLimit"), "USER_PENALTY");
-		// 1.3.2 : 이용자 신청제한 이력 조회 
-		if("Y".equals(userPenalty)) {
+
+//		String userPenalty = (String) this.commonDao.selectOne("task.".concat("selectUserLimit"), "USER_PENALTY");
+		String userPenalty = configMap.get("USER_PENALTY") != null ? configMap.get("USER_PENALTY").toString() : "";
+		// 1.3.2 : 이용자 신청제한 이력 조회
+		if(userPenalty.equals("Y")) {
+			String nextMonth = configMap.get("USER_PENALTY_DATE") != null ? configMap.get("USER_PENALTY_DATE").toString() : "";
+			if (nextMonth.equals("Y")){
+				params.put("userPenalty","Y");
+			}
 			Map<String, Object> userLimit = (Map<String, Object>) this.commonDao.selectOne(USER_SPACE.concat("getUserLimit"), params);
 			if(userLimit != null && userLimit.containsKey("limitDate")) {
 				return ValidUtils.resultErrorMap("희망도서 미대출로 인해 "+ userLimit.get("limitDate") + "까지 신청제한됩니다.");
@@ -126,32 +140,40 @@ public class RequestService {
 		// 1.4 : 사용자별 월 신청권수 확인
 		// dloanMonthCount : 서점 신청권수
 		// furnishMonthCount : 비치희망 신청권수
-		Integer dloanMonthCount = (Integer) this.commonDao.selectOne(USER_SPACE.concat("getUserRequestConuntYn"), params);
-		//Integer furnishMonthCount = (Integer) this.commonDao.selectOne(USER_SPACE.concat("getUserFurnishRequestConuntYn"), params);
-		Integer monthCount = dloanMonthCount; //+ furnishMonthCount;
-		Integer monthLimit = this.getMonthLimit();
+		int dloanMonthCount = (Integer) this.commonDao.selectOne(USER_SPACE.concat("getUserRequestConuntYn"), params);
+		int monthCount = 0;
+		if(configMap.get("MONTH_COUNT").equals("Y")){
+			int furnishMonthCount = (Integer) this.commonDao.selectOne(USER_SPACE.concat("getUserFurnishRequestConuntYn"), params);
+			monthCount = dloanMonthCount + furnishMonthCount;
+		}else{
+			monthCount = dloanMonthCount;
+		}
+
+
+		int monthLimit = Integer.parseInt(configMap.get("MONTH").toString());
 		if (monthCount >= monthLimit) {
 			return ValidUtils.resultErrorMap("희망도서 서비스 신청은 월 " + monthLimit + "권만 신청 가능합니다.");
 		}
 		
 		// 1.5 : 5만원 초과 도서인지 체크
-		Integer curPrice = 0;
+		int curPrice = 0;
+		int limitBookPrice = Integer.parseInt(configMap.get("BOOK_PRICE").toString());
 		if (StringUtils.isNumeric(params.get("price"))) {
 			curPrice = Integer.parseInt(params.get("price"));
 		} else {
 			params.put("price", "");
 		}
-		if (curPrice > 50000) {
-			return ValidUtils.resultErrorMap("절판 및 품절도서, 고가도서 (5만원 초과도서)는 신청 제외 대상 입니다.");
+		if (curPrice > limitBookPrice) {
+			return ValidUtils.resultErrorMap("절판 및 품절도서, 고가도서 ("+limitBookPrice+"원 초과도서)는 신청 제외 대상 입니다.");
 		}
 		
-		// 1.6 : 출판년도가 1년 미만인 도서인지 체크
+		// 1.6 : 출판년도가 n년 미만인 도서인지 체크
 		String pubDate = params.get("pubDate");
 		if(StringUtils.isEmpty(pubDate)) {
 			return ValidUtils.resultErrorMap("신청도서의 출판년도를 알 수 없습니다.");
 		} else {
 			pubDate = pubDate.substring(0, 4);
-			// 출판년도 1년 미만 체크
+			// 출판년도 n년 미만 체크
 			if(!isPubLimitRequestYn(pubDate, storeRequestPubDatelimit)) {
 				return ValidUtils.resultErrorMap("출판년도가 " + storeRequestPubDatelimit + "년 이상인 도서는 신청 제외 대상 입니다.");
 			}
@@ -192,54 +214,57 @@ public class RequestService {
 		// 1.9 : 신청 가능한 도서관 체크 및 금액 체크
 		Boolean isFull     = true;
 		Boolean isExcess   = false;
-		Integer price      = 0;
-		Integer limitPrice = 0;
+		int price      = 0;
+		int limitPrice = 0;
 		
 		tmpMap = new HashMap<String, Object>();
 		tmpMap.put("storeId", params.get("storeId"));
 		tmpMap.put("arIsbn",  Arrays.asList(arIsbn));
-		
-		/* 논산도서관은 대출가능 도서 체크하지 않음
-		// 1.9.1 : 대출가능 도서 유무 체크
-		Map<String, Object> libBookLoanYn = this.selectLoanYnList(tmpMap);
-		if(libBookLoanYn == null || libBookLoanYn.get("resultList") == null) {
-			return ValidUtils.resultErrorMap("대출가능여부 조회 중 오류가 발생했습니다.");
-		} else {
-			List<Map<String, Object>> libBookList = (List<Map<String, Object>>) libBookLoanYn.get("resultList");
-			// 대출 가능 도서관 리스트
-			ArrayList<String> loanPossibleLibList = new ArrayList<>(); 
-			for(Map<String, Object> libBook : libBookList) {
-				String loanYn = libBook.get("loanLimitDesc").toString();
-				String bookLibName = libBook.get("libName").toString();
-				
-				if("O".equals(loanYn)) {
-					if(!loanPossibleLibList.contains(bookLibName)) {
-						loanPossibleLibList.add(StringUtils.remove(bookLibName, "도서관"));
+
+		if(configMap.get("LOANABLE_CHECK") != null && configMap.get("LOANABLE_CHECK").equals("Y")){
+			// 1.9.1 : 대출가능 도서 유무 체크
+			Map<String, Object> libBookLoanYn = this.selectLoanYnList(tmpMap);
+			if(libBookLoanYn == null || libBookLoanYn.get("resultList") == null) {
+				return ValidUtils.resultErrorMap("대출가능여부 조회 중 오류가 발생했습니다.");
+			} else {
+				List<Map<String, Object>> libBookList = (List<Map<String, Object>>) libBookLoanYn.get("resultList");
+				// 대출 가능 도서관 리스트
+				ArrayList<String> loanPossibleLibList = new ArrayList<>();
+				for(Map<String, Object> libBook : libBookList) {
+					String loanYn = libBook.get("loanLimitDesc").toString();
+					String bookLibName = libBook.get("libName").toString();
+
+					if("O".equals(loanYn)) {
+						if(!loanPossibleLibList.contains(bookLibName)) {
+							loanPossibleLibList.add(StringUtils.remove(bookLibName, "도서관"));
+						}
 					}
 				}
-			}
-			// 에러메시지
-			String errorMsg = "";
-			for(String loanPossibleLib : loanPossibleLibList) {
-				if(StringUtils.isEmpty(errorMsg)) {
-					errorMsg = loanPossibleLib;
-				} else {
-					if(!errorMsg.contains(loanPossibleLib)) {
-						errorMsg += ", " + loanPossibleLib;
+				// 에러메시지
+				String errorMsg = "";
+				for(String loanPossibleLib : loanPossibleLibList) {
+					if(StringUtils.isEmpty(errorMsg)) {
+						errorMsg = loanPossibleLib;
+					} else {
+						if(!errorMsg.contains(loanPossibleLib)) {
+							errorMsg += ", " + loanPossibleLib;
+						}
 					}
 				}
-			}
-			
-			if(loanPossibleLibList != null && loanPossibleLibList.size() > 0) {
-				return ValidUtils.resultErrorMap(errorMsg + "도서관에 대출 가능한 책이 있습니다.\n해당도서관을 이용해주세요.");
+
+				if(loanPossibleLibList != null && loanPossibleLibList.size() > 0) {
+					return ValidUtils.resultErrorMap(errorMsg + "도서관에 대출 가능한 책이 있습니다.\n해당도서관을 이용해주세요.");
+				}
 			}
 		}
-		*/
-		
+
 		// 1.9.2 : 도서관별 책수
 		List<Map<String, String>> libBookList = (List<Map<String, String>>) commonDao.selectList(USER_SPACE.concat("selectLibBookCount"), tmpMap);
+
+		int reqLimitCnt = Integer.parseInt(configMap.get("REQ_LIMIT_COUNT").toString());
+
 		for (Map<String, String> libBook : libBookList) {
-			if (Integer.parseInt(libBook.get("cnt")) < 2) {
+			if (Integer.parseInt(libBook.get("cnt")) < reqLimitCnt) {
 				libManageCode = libBook.get("libManageCode");
 				libName       = libBook.get("libName");
 				
@@ -289,7 +314,7 @@ public class RequestService {
 			StringBuffer tempLibName1 = new StringBuffer();
 			
 			for (Map<String, String> libBook : libBookList) {
-				if (Integer.parseInt(libBook.get("cnt")) >= 1) {
+				if (Integer.parseInt(libBook.get("cnt")) >= reqLimitCnt) {
 					if (tempLibName1.length() == 0) {
 						tempLibName1.append(libBook.get("libName"));
 					} else {
@@ -303,10 +328,8 @@ public class RequestService {
 				//return ValidUtils.resultErrorMap("도서관에서 소장중인 중복도서가 1권 초과인경우 신청이 제한 됩니다.");
 				return ValidUtils.resultErrorMap("도서관에서 이미 소장중인 도서는 신청이 제한 됩니다.");
 			}
-			
-			if (!isExcess) {
-				return ValidUtils.resultErrorMap("이번 달 희망도서 서비스 신청이 마감되었습니다.");
-			}
+
+			return ValidUtils.resultErrorMap("이번 달 희망도서 서비스 신청이 마감되었습니다.");
 		}
 		
 		params.put("libManageCode", libManageCode);
@@ -406,16 +429,22 @@ public class RequestService {
 			}
 		}
 
-		/**********************************************************
-		 * NO. 4 대출가능 권수확인
-		 * 2018/02/26 패치로 대출가능 권수와 상관없이 신청 가능
-		 **********************************************************/
-		/*
-		Map<String, String> loanBook = (Map<String, String>)commonDao.selectOne(USER_SPACE.concat("getMemberLoanBookCount"), tmpMap);
-		if (Integer.parseInt(loanBook.get("configLocalLoanCount")) < (Integer.parseInt(loanBook.get("localLoanCount")) + 1)) {
-			return ValidUtils.resultErrorMap("대출가능 권수를 초과하여 신청이 불가능합니다.\n[" +libName + "]");
+		//통합대출건수 사용
+		/*List<Map<String,Object>> libList = new ArrayList<Map<String,Object>> ();
+		libList = (List<Map<String, Object>>) commonDao.selectList(USER_SPACE.concat("getTotalLibInfo"),tmpMap);
+
+		int totalLoanCnt=0;
+		for(int i=0; i<libList.size(); i++) {
+			Map<String, Object> tmpMapIn = new HashMap<String,Object> ();
+			tmpMapIn.put("userNo",        SessionUtils.getUserNo());
+			tmpMapIn.put("libManageCode", libList.get(i).get("manageCode"));
+			Map<String, String> loanTotalBook = (Map<String, String>)commonDao.selectOne(USER_SPACE.concat("getMemberLoanBookCount"), tmpMapIn);
+			totalLoanCnt+=Integer.parseInt(loanTotalBook.get("localLoanCount"));
 		}
-		*/
+		int totalCount = (int) commonDao.selectOne(USER_SPACE.concat("getTotalLoanCnt"));
+		if (totalCount < (totalLoanCnt + 1)) {
+			return ValidUtils.resultErrorMap("통합대출가능 권수를 초과하여 신청이 불가능합니다.");
+		}*/
 		
 		// 신청정보 등록
 		commonDao.insert(USER_SPACE.concat("insertRequest"), params);
@@ -433,7 +462,7 @@ public class RequestService {
 		
 		// SMS양식조회
 		Map<String, String> smsParam = new HashMap<String, String>();
-		smsParam.put("name", "신청중 (자동발송)");
+		smsParam.put("smsType", "DLN01");
 		smsParam.put("autoYn", "Y");
 
 		String smsMsg = (String) this.commonDao.selectOne("common.getSmsContents", smsParam);
@@ -463,7 +492,12 @@ public class RequestService {
 			smsMap.put("msg"          , "{\"type\":\"SM\",\"msg\":\""+tmpMsg+"\"}");
 			smsMap.put("libManageCode", reqInfo.get("libManageCode"));
 			smsMap.put("worker",        "DLOAN-USER");
-			
+
+			String alimMsg = commonService.convAlimMsg(smsParam,convData);
+			if(!alimMsg.equals("")){
+				smsMap.put("alimMsg",alimMsg);
+			}
+
 			// 00/00 00:00:00 ~ 08/59 00:00:00 = 09:00 00:00:00
 			// 18/00 00:00:00 ~ 23/59 59:59:59 = 09:00 00:00:00
 			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH24:mm:ss");
@@ -523,7 +557,11 @@ public class RequestService {
 		if (!retMap.isEmpty()) {
 			return retMap;
 		}
-		
+
+		Map<String,Object> configMap = dLoanEnvService.getConfTblMap();
+
+		storeRequestPubDatelimit = (int) configMap.get("LIB_REQ_LIMIT_YEAR");
+
 		/**********************************************************
 		 *  지역 변수 선언
 		 **********************************************************/
@@ -562,10 +600,10 @@ public class RequestService {
 		// 1.3 : 사용자별 월 신청권수 확인
 		// dloanMonthCount : 서점 신청권수
 		// furnishMonthCount : 비치희망 신청권수
-		Integer dloanMonthCount = (Integer) this.commonDao.selectOne(USER_SPACE.concat("getUserRequestConuntYn"), params);
-		Integer furnishMonthCount = (Integer) this.commonDao.selectOne(USER_SPACE.concat("getUserFurnishRequestConuntYn"), params);
-		Integer monthCount = dloanMonthCount + furnishMonthCount;
-		Integer monthLimit = this.getMonthLimit();
+		int dloanMonthCount = (Integer) this.commonDao.selectOne(USER_SPACE.concat("getUserRequestConuntYn"), params);
+		int furnishMonthCount = (Integer) this.commonDao.selectOne(USER_SPACE.concat("getUserFurnishRequestConuntYn"), params);
+		int monthCount = dloanMonthCount + furnishMonthCount;
+		int monthLimit = (int) configMap.get("MONTH");
 		if (monthCount >= monthLimit) {
 			return ValidUtils.resultErrorMap("희망도서 서비스 신청은 월 " + monthLimit + "권만 신청 가능합니다.");
 		}
@@ -927,16 +965,6 @@ public class RequestService {
 		}
 	
 		return null;
-	}
-	
-	/**
-	 * 월신청권수 조회
-	 * 
-	 * @return
-	 */
-	public Integer getMonthLimit() {
-		String monthLimit = (String) this.commonDao.selectOne(USER_SPACE.concat("getMonthLimit"));
-		return Integer.parseInt(monthLimit);
 	}
 	
 	/**

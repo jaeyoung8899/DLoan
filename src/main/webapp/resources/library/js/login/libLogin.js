@@ -56,6 +56,8 @@ var libLogin = {
 		$("#btnSubmit").on('click', function (event) {
 			libLogin.login();
 		});
+
+		libLogin.getViewInfo();
 	},
 		
 	/**
@@ -159,6 +161,20 @@ var libLogin = {
 				return unescape(y);
 			}
 		}
+	},
+	getViewInfo : function () {
+		$.ajax({
+			crossOrigin: true,
+			type       : 'GET',
+			url        : _ctx + '/common/getConfig',
+			datatype   : 'json',
+			success    : function(data) {
+				localStorage.setItem("viewOptionInfo",JSON.stringify(data));
+			},
+			error      : function() {
+				alert('데이터가져오기실패');
+			}
+		});
 	}
 	
 };

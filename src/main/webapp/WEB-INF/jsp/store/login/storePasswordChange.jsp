@@ -9,8 +9,15 @@
 <link rel="stylesheet" href="<c:url value="/resources/store/css/02_login.css?v=${cssver}" />" type="text/css" media="screen" title="no title" charset="utf-8"/>
 </head>
 <body>
-	
-	<%@ include file="/WEB-INF/jsp/common/storeHeader.jsp"%>
+
+	<c:choose>
+		<c:when test="${storeYn eq 'Y'}">
+			<%@ include file="/WEB-INF/jsp/common/storeHeaderReturn.jsp"%>
+		</c:when>
+		<c:otherwise>
+			<%@ include file="/WEB-INF/jsp/common/storeHeader.jsp"%>
+		</c:otherwise>
+	</c:choose>
 
 	<div class="content">
 		<section class="content_login" > 

@@ -111,10 +111,10 @@
 						</table>
 					</div>
 				</div>
+				<div class="btn_wrap" style="width: 60%">
+					<input type="button" class="btn_search" value="저장" id="btnSave">
+				</div>
 			</section>
-			<div class="btn_wrap">
-				<input type="button" class="btn_search" value="저장" id="btnSave">
-			</div>
 		</section>
 	</div>
 	<%@ include file="/WEB-INF/jsp/common/libFooter.jsp"%>

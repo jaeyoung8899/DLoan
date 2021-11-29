@@ -41,7 +41,7 @@ public class LibResService {
 	
 
 	public Map<String, Object> saveLibApprove(List<String> ltRecKey,
-			List<String> ltResStatus, String resKey) {
+			List<String> ltResStatus, String resKey, List<String>  ltReturnBookReason) {
 		
 		Map<String, Object> retMap = ValidUtils.resultSuccessMap();
 		
@@ -49,6 +49,7 @@ public class LibResService {
 			Map<String, String> params = new HashMap<String, String>();
 			params.put("recKey",    ltRecKey.get(i));
 			params.put("resStatus", ltResStatus.get(i));
+			params.put("resRemark", ltReturnBookReason.get(i));
 			commonDao.update(NAME_SPACE.concat("updateLibReqResponsStatus"), params);
 		}
 
