@@ -37,10 +37,16 @@
 									<td style="text-align:left; padding-left :10px;">${row.confDesc}</td>
 									<td style="text-align:left; padding-right:10px;">
 										<c:choose>
-											<c:when test="${row.confId eq 'AUTO_LIMIT' or row.confId eq 'USER_PENALTY'}">
+											<c:when test="${row.confId eq 'AUTO_LIMIT' or row.confId eq 'USER_PENALTY' or row.confId eq 'MONTH_COUNT'}">
 												<select name="confValue" style="width:100%;height:30px;">
 													<option value="Y" <c:if test="${row.confValue eq 'Y'}">selected="selected"</c:if>>사용</option>
 													<option value="N" <c:if test="${row.confValue eq null or row.confValue eq 'N'}">selected="selected"</c:if>>사용안함</option>
+												</select>
+											</c:when>
+											<c:when test="${row.confId eq 'USER_PENALTY_DATE'}">
+												<select name="confValue" style="width:100%;height:30px;">
+													<option value="Y" <c:if test="${row.confValue eq 'Y'}">selected="selected"</c:if>>다음달 제한</option>
+													<option value="N" <c:if test="${row.confValue eq null or row.confValue eq 'N'}">selected="selected"</c:if>>내일부터 제한</option>
 												</select>
 											</c:when>
 											<c:otherwise>
@@ -56,7 +62,7 @@
 				</tbody>
 				</table>
 			</section>
-			<div class="btn_wrap">
+			<div class="btn_wrap" style="width: 97%">
 				<input type="button" class="btn_search" value="저장" id="btnSave">
 			</div>
 		</section>

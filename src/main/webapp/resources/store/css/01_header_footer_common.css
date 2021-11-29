@@ -58,6 +58,7 @@ header{
 .menu_nav>li>a{display: block;color:rgba(0,0,0,0);width: 140px; height:80px;}
 .menu_nav .menu_tab01{background: url(../images/menu-approver-off.png)}
 .menu_nav .menu_tab02{background: url(../images/menu-return-off.png)}
+.menu_nav .menu_tab021{background: url(../images/menu-return-off2.png)}
 .menu_nav .menu_tab03{background: url(../images/menu-delivery-off.png)}
 .menu_nav .menu_tab04{background: url(../images/menu-delivery-list-off.png)}
 .menu_nav .menu_tab05{background: url(../images/menu-cancel-list-bookstore-off.png)}
@@ -69,6 +70,10 @@ header{
 .menu_nav .menu_tab02:hover,
 .menu_nav .menu_tab02_on
 {background: url(../images/menu-return-bookstore-on.png)}
+.menu_nav .menu_tab021:active,
+.menu_nav .menu_tab021:hover,
+.menu_nav .menu_tab021_on
+{background: url(../images/menu-return-bookstore-on2.png)}
 .menu_nav .menu_tab03:active,
 .menu_nav .menu_tab03:hover,
 .menu_nav .menu_tab03_on
@@ -139,7 +144,7 @@ select:focus,textarea:focus
 }
 .content_main{
   position: relative;
-  margin: 0 auto;margin-top:30px;width: 1100px;
+  margin: 0 auto;margin-top:30px;width: 90%;
   background: #ffffff;min-height:770px;
 }
 

@@ -46,19 +46,33 @@
 					<colgroup>
 						<col width="50px">
 						<col width="150px">
-						<col width="70px">
-						<col width="70px">
-						<col width="70px">
-						<col width="70px">
-						<col width="70px">
-						<col width="70px">
-						<col width="70px">
-						<col width="70px">
-						<col width="70px">
-						<col width="70px">
-						<col width="70px">
-						<col width="70px">
-						<col width="70px">
+						<col width="110px">
+						<col width="110px">
+						<col width="110px">
+						<col width="110px">
+						<col width="110px">
+						<col width="110px">
+						<col width="110px">
+						<col width="110px">
+						<col width="110px">
+						<col width="110px">
+						<col width="110px">
+						<col width="110px">
+						<col width="110px">
+
+
+<%--						<col width="70px">--%>
+<%--						<col width="70px">--%>
+<%--						<col width="70px">--%>
+<%--						<col width="70px">--%>
+<%--						<col width="70px">--%>
+<%--						<col width="70px">--%>
+<%--						<col width="70px">--%>
+<%--						<col width="70px">--%>
+<%--						<col width="70px">--%>
+<%--						<col width="70px">--%>
+<%--						<col width="70px">--%>
+<%--						<col width="70px">--%>
 					</colgroup>
 					<thead>
 					<tr>

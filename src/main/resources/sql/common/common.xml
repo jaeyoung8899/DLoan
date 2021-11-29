@@ -176,19 +176,19 @@
 	<select id="getSmsContents" parameterType="Map"  resultType="String">
 		SELECT CONTENTS
 		  FROM DLOAN_SMS_CONF_TBL
-		 WHERE NAME    = #{name}
+		 WHERE SMS_TYPE= #{smsType}
 		   AND AUTO_YN = #{autoYn}
 	</select>
-	
-	
-	<select id="getAlimContents" parameterType="Map"  resultType="Map">
-		SELECT TPL_NAME,
-			   TPL_CODE,
-			   TPL_MESSAGE
-		  FROM ECO_ALIMTALK_MAPPING_TBL
-		 WHERE SMS_NAME = #{smsName}
-		   AND SMS_TYPE = #{smsType}
-		   AND USE_YN = #{useYn}
-		   AND MANAGE_CODE = #{manageCode}
+
+
+	<select id="getAlimMsg" parameterType="Map"  resultType="camelMap">
+		SELECT TPL_MESSAGE
+			FROM ECO_ALIMTALK_MAPPING_TBL
+		WHERE SMS_TYPE    = #{smsType}
+			AND USE_YN = 'Y'
+			AND APPROVE_YN = 'Y'
+		<if test="manageCode != null and manageCode != ''">
+			AND LIB_MANAGE_CODE = #{manageCode}
+		</if>
 	</select>
 </mapper>

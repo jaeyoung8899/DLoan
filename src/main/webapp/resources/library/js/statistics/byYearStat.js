@@ -32,7 +32,7 @@ var byYearStat = {
 					$('.'+i+'month a').removeClass("tab_on");
 				}
 				
-				$('#totalInfo').css("display","block");
+				$('#totalInfo').css("display","");
 				$('.totalYear a').addClass("tab_on");
 				
 			}else{
@@ -42,7 +42,7 @@ var byYearStat = {
 					$('.'+i+'month a').removeClass("tab_on");
 				}
 				
-				$('#monthInfo_'+viewMonth).css("display","block");
+				$('#monthInfo_'+viewMonth).css("display","");
 				$('#totalInfo').css("display","none");
 				$('.'+viewMonth+'month a').addClass("tab_on");
 			}
@@ -85,7 +85,7 @@ var byYearStat = {
 		$('#totalInfo').css("display","none");
 		$('.totalYear a').removeClass("tab_on");
 		
-		$('#monthInfo_'+month).css("display","block");
+		$('#monthInfo_'+month).css("display","");
 		
 		$('.'+month+'month a').addClass("tab_on");
 		

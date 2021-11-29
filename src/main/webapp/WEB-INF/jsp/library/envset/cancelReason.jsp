@@ -19,8 +19,8 @@
 				</div>
 				<table class="result_table" id="reasonInfo">
 				<colgroup>
-					<col width="100px">
-					<col width="100px">
+					<col width="50px">
+					<col width="50px">
 					<col width="800px">
 				</colgroup>
 				<thead>
@@ -57,7 +57,7 @@
 				</tbody>
 				</table>
 			</section>
-			<div class="btn_wrap">
+			<div class="btn_wrap" style="width: 97%">
 				<input type="button" class="btn_search" value="저장" id="btnSave">
 			</div>
 		</section>

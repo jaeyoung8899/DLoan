@@ -269,7 +269,7 @@ h3.baro_h3{
 }
 .search_form_02{
   margin-top: 10px;padding-left:5%;
-  width: 870px; height:;
+  width: 870px;
   box-sizing: border-box;
 	border:1px solid #B7BAD9;font-size:14px;
 }
@@ -350,7 +350,7 @@ and (max-device-width : 1040px){
 .input_wrap{width: 49%}
 .btn_cancel{margin-right: 20px;}
 }
-}
+
 
 /*width 1040px이하 (고정픽셀)----------------------------------------------------*/
 @media screen and (max-width: 1040px){

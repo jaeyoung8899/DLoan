@@ -101,7 +101,7 @@ input.btn_calendar{
 	margin-right: 5px;width:28px;height:30px;
 	background:url(../images/icon-calendar.png);
 }
-.btn_wrap{margin: 0 auto; width: 1000px; text-align: right;}
+/*.btn_wrap{margin: 0 auto; width: 1000px; text-align: right;}*/
 .btn_search{
 	margin-top: 10px;
 	width: 120px;height:30px;
@@ -109,16 +109,16 @@ input.btn_calendar{
 	color:#ffffff; font-size: 14px;
 	font-weight: bold;border-radius: 4px;
 	}
-.result_list_del{
-		position: relative;
-	 margin: 0 auto; margin-top:50px; width: 1000px;
-	}
+/*.result_list_del{*/
+/*		position: relative;*/
+/*	 margin: 0 auto; margin-top:50px; width: 1000px;*/
+/*	}*/
 	/*result_table------------------------------------------------------------------*/
-	.result_table{
-	width: 1000px; /*height:240px;*/
-	border-bottom: 1px solid #466482;
-	box-sizing: border-box;
-	}
+	/*.result_table{*/
+	/*width: 1000px; !*height:240px;*!*/
+	/*border-bottom: 1px solid #466482;*/
+	/*box-sizing: border-box;*/
+	/*}*/
 	.result_table tr{height:40px;}
 	.result_table tr:nth-of-type(odd){background:#F2F4F6 }
 	/*.result_table tr:nth-of-type(odd):active{background:#deeae4 }

@@ -41,46 +41,32 @@ public class CommonService {
 		if (!StringUtils.isEmpty(recever)) {
 			params.put("recever", recever.replaceAll("-", ""));
 		}
-//		 if(params.containsKey("reqStatus")) { 
-//			this.commonDao.update(NAME_SPACE.concat("smsSend2"), params); //잘못된 번호 발송으로 인해 수정해줌.
-//		}else {
+
+		if(params.get("alimMsg") != null && !params.get("alimMsg").toString().equals("")){
+			this.commonDao.update(NAME_SPACE.concat("alimTalkSend"),params);
+		}else{
 			this.commonDao.update(NAME_SPACE.concat("smsSend"), params);
-//		}
+		}
 	}
 	
 	//@Transactional(isolation=Isolation.DEFAULT, propagation=Propagation.REQUIRES_NEW, rollbackFor={Exception.class, SQLException.class})
-		public void alimTalkSend(Map<String, Object> params) {
-			String sender = (String) params.get("sender");
-			if (!StringUtils.isEmpty(sender)) {
-				params.put("sender", sender.replaceAll("-", ""));
-			}
-			
-			String recever = (String) params.get("recever");
-			if (!StringUtils.isEmpty(recever)) {
-				params.put("recever", recever.replaceAll("-", ""));
-			}
-//			 if(params.containsKey("reqStatus")) { 
-//				this.commonDao.update(NAME_SPACE.concat("smsSend2"), params); //잘못된 번호 발송으로 인해 수정해줌.
-//			}else {
-				this.commonDao.update(NAME_SPACE.concat("alimTalkSend"), params);
-//			}
-		}
-	
-	//@Transactional(isolation=Isolation.DEFAULT, propagation=Propagation.REQUIRES_NEW, rollbackFor={Exception.class, SQLException.class})
-	public void smsSendRequest(Map<String, Object> params) {
+	public void alimTalkSend(Map<String, Object> params) {
 		String sender = (String) params.get("sender");
 		if (!StringUtils.isEmpty(sender)) {
 			params.put("sender", sender.replaceAll("-", ""));
 		}
-		
+
 		String recever = (String) params.get("recever");
 		if (!StringUtils.isEmpty(recever)) {
 			params.put("recever", recever.replaceAll("-", ""));
 		}
-		
-		//this.commonDao.update(NAME_SPACE.concat("smsSendDloan"), params);
-		this.commonDao.update(NAME_SPACE.concat("smsSend"), params);
+//			 if(params.containsKey("reqStatus")) { 
+//				this.commonDao.update(NAME_SPACE.concat("smsSend2"), params); //잘못된 번호 발송으로 인해 수정해줌.
+//			}else {
+			this.commonDao.update(NAME_SPACE.concat("alimTalkSend"), params);
+//			}
 	}
+
 	/**
 	 * SMS 메시지 변환
 	 * <pre>
@@ -211,8 +197,10 @@ public class CommonService {
 	 * @param convData
 	 * @return
 	 */
-	public String convAlimMsg(String msg, Map<String, String> convData) {
-		
+	public String convAlimMsg(Map<String,String> smsParam, Map<String, String> convData) {
+
+		String msg = commonDao.selectOne(NAME_SPACE.concat("getAlimMsg"),smsParam)== null ? "" :(String) commonDao.selectOne(NAME_SPACE.concat("getAlimMsg"),smsParam);
+
 		if (StringUtils.isEmpty(msg) || convData == null || convData.isEmpty()) {
 			return msg;
 		}

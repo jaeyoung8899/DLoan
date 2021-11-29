@@ -9,7 +9,15 @@
 <link rel="stylesheet" href="<c:url value="/resources/store/css/04_popup.css?v=${cssver}" />" type="text/css" title="no title" charset="utf-8"/>
 </head>
 <body>
-	<%@ include file="/WEB-INF/jsp/common/storeHeader.jsp"%>
+	<c:choose>
+		<c:when test="${storeYn eq 'Y'}">
+			<%@ include file="/WEB-INF/jsp/common/storeHeaderReturn.jsp"%>
+		</c:when>
+		<c:otherwise>
+			<%@ include file="/WEB-INF/jsp/common/storeHeader.jsp"%>
+		</c:otherwise>
+	</c:choose>
+
 	<div class="content">
 		<section class="content_main">
 			<img src="<c:url value="/resources/store/images/bookstore-box-subtitle.png" />" alt="" class="h2_square">
@@ -20,44 +28,37 @@
 				<input type="hidden" id="start" name="start" value="${start}" />
 				<input type="hidden" name="display" value="10" />
 				<section class="search_form_01">
-					<%--
-					<label for="selStoreId" class="first_label">신청서점</label>
-					<select class="select_120" id="selStoreId" name="reqStoreId">
-						<option value="" <c:if test="${reqStoreId eq ''}">selected="selected"</c:if>>전체</option>
-						<c:forEach var="row" items="${storeList}" varStatus="status">
-							<c:if test="${row.storeId ne null}">
-								<option value="${row.storeId}" <c:if test="${reqStoreId eq row.storeId}">selected="selected"</c:if>>${row.storeName}</option>
-							</c:if>
-						</c:forEach>
-					</select>
-					<label for="selLibManageCode" style="margin-left:20px;">배분도서관</label>
-					<select class="select_120" id="selLibManageCode" name="reqLibManageCode">
-						<option value="" <c:if test="${reqLibManageCode eq ''}">selected="selected"</c:if>>전체</option>
-						<c:forEach var="row" items="${libList}" varStatus="status">
-							<c:if test="${row.libManageCode ne null}">
-								<option value="${row.libManageCode}" <c:if test="${reqLibManageCode eq row.libManageCode}">selected="selected"</c:if>>${row.libName}</option>
-							</c:if>
-						</c:forEach>
-					</select>
-					 --%>
-					<label for="selStatus" class="first_label">신청상태</label>
-					<select class="select_140" id="selStatus" name="reqStatus">
-						<option value="" <c:if test="${reqStatus eq ''}">selected="selected"</c:if>>전체</option>
-						<option value="S02" <c:if test="${reqStatus eq 'S02'}">selected="selected"</c:if>>서점신청거절</option>
-						<option value="L02" <c:if test="${reqStatus eq 'L02'}">selected="selected"</c:if>>도서관신청거절</option>
-					</select>
-					<label for="from_reqDate" style="margin-left:20px;">신청일</label>
-					<input type="text" class="input_120" id="from_reqDate" name="from_reqDate" title="신청시작일" value="${from_reqDate }" rules="date">
-					-
-					<input type="text" class="input_120" id="to_reqDate" name="to_reqDate" title="신청종료일" value="${to_reqDate }" rules="date"><br>
-					<label for="title" class="first_label">서명</label>
-					<input type="text" class="input_200" id="title" name="title" value="${title}">
-					<label for="author">저자</label>
-					<input type="text" class="input_120" id="author" name="author" value="${author }">
-					<label for="publisher">출판사</label>
-					<input type="text" class="input_120" id="publisher" name="publisher"  value="${publisher }">
-					<label for="isbn">ISBN</label>
-					<input type="text" class="input_160" id="isbn" name="isbn" value="${isbn}">
+					<div class="search_form_field">
+						<label for="selStatus" class="search_form_label">신청상태</label>
+						<select class="select_140" id="selStatus" name="reqStatus">
+							<option value="">전체</option>
+							<option value="S02">서점신청거절</option>
+							<option value="L02">도서관신청거절</option>
+						</select>
+					</div>
+					<div class="search_form_field">
+						<label for="from_reqDate" class="search_form_label">신청일</label>
+						<input type="text" class="input_100 hasDatepicker" id="from_reqDate" name="from_reqDate" title="신청시작일" value="" rules="date">
+						-
+						<input type="text" class="input_100 hasDatepicker" id="to_reqDate" name="to_reqDate" title="신청종료일" value="" rules="date"><br>
+					</div>
+					<p></p>
+					<div class="search_form_field">
+						<label for="title" class="search_form_label">서명</label>
+						<input type="text" class="input_200" id="title" name="title" value="">
+					</div>
+					<div class="search_form_field">
+						<label for="author" class="search_form_label">저자</label>
+						<input type="text" class="input_160" id="author" name="author" value="">
+					</div>
+					<div class="search_form_field">
+						<label for="publisher" class="search_form_label">출판사</label>
+						<input type="text" class="input_160" id="publisher" name="publisher" value="">
+					</div>
+					<div class="search_form_field">
+						<label for="isbn" class="search_form_label">ISBN</label>
+						<input type="text" class="input_160" id="isbn" name="isbn" value="">
+					</div>
 				</section>
 				<div class="btn_wrap">
 					<input type="button" class="btn_search" value="검색" id="btnSearch">
@@ -68,14 +69,14 @@
 				<table class="result_table" id="requestInfo">
 					<colgroup>
 						<col width="35px">
-						<col width="75px">
-						<col width="200px">
+						<col width="100px">
+						<col width="300px">
 						<col width="85px">
 						<col width="90px">
 						<col width="100px">
 						<col width="50px">
 						<col width="50px">
-						<col width="80px">
+						<col width="90px">
 						<col>
 					</colgroup>
 					<thead>

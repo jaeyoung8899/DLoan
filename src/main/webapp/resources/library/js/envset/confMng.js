@@ -82,6 +82,7 @@ var confMng = {
 			$.commAjax (option, function (result) {
 				if (result.resultCode == "Y") {
 					alert('저장 되었습니다.');
+					comm.setConfTbl();
 					confMng.search()
 				} else {
 					alert(result.resultMessage);

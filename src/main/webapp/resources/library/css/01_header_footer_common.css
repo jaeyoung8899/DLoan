@@ -54,6 +54,8 @@ header{
 .menu_nav .menu_tab02{background: url(../images/menu-delivery-off.png)}
 .menu_nav .menu_tab03{background: url(../images/menu-stat-off.png)}
 .menu_nav .menu_tab04{background: url(../images/menu-setting-off.png)}
+.menu_nav .menu_tab05{background: url(../images/menu-spending-off.png)}
+.menu_nav .menu_tab06{background: url(../images/menu-sms-off.png)}
 .menu_nav .menu_tab01:active,
 .menu_nav .menu_tab01:hover,
 .menu_nav .menu_tab01_on
@@ -70,6 +72,14 @@ header{
 .menu_nav .menu_tab04:hover,
 .menu_nav .menu_tab04_on
 {background: url(../images/menu-setting-library-on.png)}
+.menu_nav .menu_tab05:active,
+.menu_nav .menu_tab05:hover,
+.menu_nav .menu_tab05_on
+{background: url(../images/menu-spending-library-on.png)}
+.menu_nav .menu_tab06:active,
+.menu_nav .menu_tab06:hover,
+.menu_nav .menu_tab06_on
+{background: url(../images/menu-sms-on.png)}
 
 /*--------------------------------footer--------------------------------------*/
 footer{
@@ -128,18 +138,22 @@ select:focus,textarea:focus
 }
 .content_main{
   position: relative;
-  margin: 0 auto;margin-top:30px;width: 1100px;
+  margin: 0 auto;margin-top:30px;width: 90%;
   background: #ffffff;min-height:770px;
 }
 
 /*input,select 너비 별 스타일 지정*/
-
+input.input_80{width: 80px; height:30px;}
+input.input_100{width: 100px; height:30px;}
 input.input_120{width: 120px; height:30px;}
 input.input_140{width: 140px; height:30px;}
 input.input_160{width: 160px; height:30px;}
+input.input_200{width: 200px; height:30px;}
 input.input_280{width: 280px; height:30px;}
 input.input_350{width: 350px; height:30px;}
 input.input_415{width: 415px; height:30px;}
 
+select.select_100{width: 100px; height:30px;}
 select.select_140{width: 140px; height:30px;}
+select.select_180{width: 180px; height:30px;}
 select.select_420{width: 420px; height:30px;}

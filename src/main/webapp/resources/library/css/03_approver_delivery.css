@@ -1,7 +1,7 @@
 @CHARSET "UTF-8";
 .h2_square{position: absolute;top:25px; left:-10px;}
 .h2{
-  margin:0 auto;width: 1000px; line-height: 100px;
+  margin:0 auto;width: 95%; line-height: 100px;
   font-size:28px;color:#323232;
   font-weight: bold;text-indent: 25px;
   border-bottom: 1px solid #c8c8c8;
@@ -10,7 +10,8 @@
 .search_form_01{
 	margin:0 auto;margin-top:40px;
 	padding: 20px 0 10px 30px; box-sizing: border-box;
-	width: 1000px;
+	width: 90%;
+	min-width: 1100px;
 	background: #f2f6f4;
 }
 .search_form_01>label{
@@ -30,7 +31,7 @@ input.btn_calendar{
 	background:url(../images/icon-calendar.png);
 }
 /*-------------------------------------------------------------------------*/
-.btn_wrap{margin: 0 auto; width: 1000px; text-align: right;}
+.btn_wrap{margin: 0 auto; width: 90%; text-align: right;}
 .btn_search{
 	margin-top: 10px;
 	width: 120px;height:30px;
@@ -43,15 +44,16 @@ input.btn_calendar{
 /*-------------------------------------------------------------------------*/
 .result_list{
 	position: relative;
- margin: 0 auto; margin-top:80px; width: 1000px;
+ margin: 0 auto; margin-top:80px; min-width: 1100px; width: 90%;
 }
 .result_list_del{
 	position: relative;
- margin: 0 auto; margin-top:50px; width: 1000px;
+ margin: 0 auto; margin-top:50px; width: 90%;
 }
 /*result_table------------------------------------------------------------------*/
 .result_table{
-width: 1000px; /* height:240px; */
+min-width: 1000px; /* height:240px; */
+	width: 100%;
 border-bottom: 1px solid #466482;
 box-sizing: border-box;
 }
@@ -142,3 +144,33 @@ input.btn_list{
 	color:#ffffff; font-size: 14px;
 	font-weight: bold;border-radius: 4px;
 	}
+
+.search_form_field {
+	display: inline-block;
+	width: 24%;
+	min-width: 345px;
+	margin: 5px 0;
+}
+
+.search_form_01 .search_form_field .search_form_label {
+	text-align: right;
+	display: inline-block;
+	font-size: 14px;
+	color: #323232;
+	font-weight: bold;
+	height: 100%;
+	width: 100px;
+	margin: 0 10px;
+}
+
+input.input_100{
+	width: 23.5%; height: 30px;
+	line-height: 30px;
+	box-sizing: border-box;
+	border: 1px solid #c8c8c8;
+}
+
+.result_list_wrapper {
+	width:100%;
+	overflow-x:auto;
+}

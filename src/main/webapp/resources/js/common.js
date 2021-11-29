@@ -298,7 +298,96 @@ var comm = {
 	status : function() {
 		console.log('U01 : 신청중\nU02 : 신청취소\nS01 : 서점승인 (도서준비중)\nS02 : 서점신청거절 (신청거절)\nS03 : 도서관확인요청 (신청중)\nS04 : 도서준비중\nS05 : 대출대기중\nS06 : 대출\n'
 				+ 'S07 : 반납\nS08 : 미대출취소\nL01 : 도서관승인 (도서준비중)\nL02 : 도서관신청거절 (신청거절)');
+	},
+
+	getViewOptionData : function(classCode, manageCode,storeId) {
+
+		var viewOptionInfo = localStorage.getItem('viewOptionInfo');
+		if(viewOptionInfo === null || viewOptionInfo === undefined || viewOptionInfo === 'undefined' || viewOptionInfo === '')
+		{
+			return "";
+		}
+		else
+		{
+			var jsonData_viewOptionInfo = JSON.parse(viewOptionInfo);
+			console.log(jsonData_viewOptionInfo)
+			var result = $.grep(jsonData_viewOptionInfo, function(e)
+			{
+				return (e.CLASS_CODE == classCode) && (e.MANAGE_CODE == manageCode ||  e.MANAGE_CODE == 'ALL');
+			});
+
+			console.log(result)
+
+			if ( result == null || result.length <= 0 )
+				return "";
+			else
+			{
+
+
+				if(result.length > 1)
+				{
+					var return_array = [];
+					// 자관 정보가 있는경우 자관꺼만 전달
+					for(var index in result)
+					{
+						var temp_one = result[index];
+						if(temp_one.MANAGE_CODE === manageCode)
+						{
+							return_array.push(temp_one);
+
+						}
+					}
+
+					// 여기까지 값이 없이 왔다면 그냥 모두 전달
+					if(return_array.length == 1)
+					{
+						return return_array;
+					}
+					else
+					{
+						//중복된 데이터가 있는 경우도 있어서 배열로  return
+						return result;
+					}
+				}
+				else
+				{
+					//중복된 데이터가 있는 경우도 있어서 배열로  return
+					return result;
+				}
+
+
+			}
+		}
+	},
+	// ViewOptionInfo의 정보를 추출한다.
+	getViewOptionData_value: function (classCode, manageCode,storeId){
+
+		var getValue = comm.getViewOptionData(classCode, manageCode);
+		var return_data = "";
+
+		if(getValue.length > 0)
+		{
+			return_data = getValue[0].VALUE;
+		}
+		else
+		{
+			return_data = '';
+		}
+
+		return return_data;
+	},
+
+	//conf_tbl 다시조회
+	setConfTbl : function () {
+		var option = {
+			url   : _ctx + '/common/getConfig'
+		};
+
+		$.commAjax (option, function (result) {
+			console.log('설정 재조회')
+		});
 	}
+
 };
 
 
@@ -686,6 +775,12 @@ var libcomm = {
 			}
 		});
 	},
+	headerCheck : function () {
+		var headerCheckYn = comm.getViewOptionData_value('006','ALL');
+		if(headerCheckYn === 'Y'){
+			$('#spendingYn').show();
+		}
+	}
 }
 
 /**

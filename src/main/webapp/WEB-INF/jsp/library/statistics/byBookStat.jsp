@@ -47,7 +47,7 @@
 					<div class="btn_wrap">
 						<input type="button" class="btn_search" value="검색" id="btnSearch">
 					</div>
-					<div class="btn_wrap_1000 excel">
+					<div class="btn_wrap_1000">
 						
 					</div>
 					
