@@ -148,7 +148,7 @@
 										<td><fmt:formatDate value="${row.returnDate}" pattern="yyyy-MM-dd"/></td>
 										<td><span class="${row.reqStatus}">${row.reqStatusName}</span></td>
 										<td>${row.userNo}</td>
-										<td>${row.userName}</td>
+										<td>${row.name}</td>
 										<td>${row.smsYn}</td>
 										<td style="text-align:left;">${row.cancelReason}</td>
 										<td style="text-align:left;">${row.confirmMessage}</td>

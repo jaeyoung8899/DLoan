@@ -106,7 +106,7 @@
 									<label for="check_${row.rnum}" class="check_wrap"></label>
 								</td>
 								<td>${row.userNo}</td>
-								<td>${row.reqHandphone}</td>
+								<td>${row.handphone}</td>
 								<td>${row.libManageName}</td>
 								<td style="text-align:left;">${row.title}</td>
 								<td><fmt:formatDate value="${row.reqDate}" pattern="yyyy MM-dd"/></td>
