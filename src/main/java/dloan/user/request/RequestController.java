@@ -114,7 +114,8 @@ public class RequestController {
 		}
 		
 		// 도서관 목록 조회
-		List<Map<String, Object>> libraryList = this.commonService.selectLibrary(null);
+		List<Map<String, Object>> libraryList = this.commonService.selectLibraryLimit();
+
 		// 오름차순 정렬
 		Collections.sort(libraryList, mapComparator);
 		
@@ -135,7 +136,6 @@ public class RequestController {
 			libraryList = new ArrayList<Map<String, Object>>();
 			libraryList.addAll(tempLibraryList);
 		}*/
-		System.out.println("경로: user/request/view/request"+SessionUtils.getViewCode());
 		ModelAndView mv = new ModelAndView("user/request/view/request"+SessionUtils.getViewCode());
 		mv.addObject("storeList" , this.commonService.selectStore("randomOrder"));
 		mv.addObject("libraryList" , libraryList);

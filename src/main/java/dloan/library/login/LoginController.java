@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import dloan.common.handler.DLoanEnvService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -23,9 +24,9 @@ import dloan.common.util.ValidUtils;
 @RequestMapping(value="/lib")
 public class LoginController {
 
-	@Value("#{conf['lib_session_timeout']}")
-	private int libSessionTimeout;
-	
+	@Autowired
+	private DLoanEnvService dLoanEnvService;
+
 	@Autowired
 	private LoginService loginService;
 	
@@ -53,8 +54,11 @@ public class LoginController {
 		
 		Map<String, Object> rtnMap = this.loginService.login(params);
 		if ("Y".equals(rtnMap.get("resultCode"))) {
-			SessionUtils.setLibExfTime(new Date(new Date().getTime() + (this.libSessionTimeout*1000)));
-			session.setMaxInactiveInterval(this.libSessionTimeout);
+			Map<String,Object> configMap = dLoanEnvService.getConfTblMap();
+			//세션타임 설정 기본 30분
+			long libSessionTimeout = configMap.get("LIB_SESSION_TIMEOUT") != null ? Long.parseLong(configMap.get("LIB_SESSION_TIMEOUT").toString()) : 30L;
+			SessionUtils.setLibExfTime(new Date(new Date().getTime() + (libSessionTimeout*60*1000)));
+			session.setMaxInactiveInterval((int) libSessionTimeout *60);
 		}
 		
 		return rtnMap;

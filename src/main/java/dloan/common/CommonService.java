@@ -252,4 +252,9 @@ public class CommonService {
 
 		return viewList;
 	}
+
+	@SuppressWarnings("unchecked")
+	public List<Map<String, Object>> selectLibraryLimit() {
+		return (List<Map<String, Object>>) commonDao.selectList(NAME_SPACE.concat("selectLibraryLimit"));
+	}
 }

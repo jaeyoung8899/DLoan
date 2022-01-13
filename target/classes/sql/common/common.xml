@@ -23,17 +23,26 @@
 	
 	<!-- 서점 정보  -->
 	<select id="selectStore" parameterType="Map"  resultType="camelMap">
-		SELECT  STORE_ID   AS CODE,
-				STORE_NAME AS VALUE,
-				PASSWORD,
-				STORE_PHONE
-		   FROM DLOAN_STORE_TBL
-		<where>
-			<if test="storeId != null and storeId != '' and storeId != 'randomOrder'">
-			STORE_ID = #{storeId}
-			</if>
-		</where>
-				order by STORE_NAME ASC
+		SELECT
+			STORE.STORE_ID AS CODE,
+			STORE.STORE_NAME AS VALUE,
+			STORE.PASSWORD AS PASSWORD,
+			STORE.STORE_PHONE AS STORE_PHONE,
+			NVL(LIMIT.LIMIT_YN, 'N') AS LIMIT_YN,
+			NVL(LIMIT.LIST_YN, 'N') AS LIST_YN,
+			TO_CHAR(LIMIT.LIMIT_DATE_1,'yyyy-MM-dd') AS LIMIT_DATE_1,
+			TO_CHAR(LIMIT.LIMIT_DATE_2,'yyyy-MM-dd') AS LIMIT_DATE_2,
+			LIMIT.LIMIT_REASON
+		FROM
+			DLOAN_STORE_TBL STORE, DLOAN_LIMIT_TBL LIMIT
+		WHERE
+			STORE.STORE_ID IS NOT NULL
+			AND STORE.STORE_ID = LIMIT.STORE_ID(+)
+			AND LIMIT.LIST_YN ='N'
+		<if test="storeId != null and storeId != '' and storeId != 'randomOrder'">
+			AND STORE_ID = #{storeId}
+		</if>
+		ORDER BY STORE_NAME ASC
 	</select> 
 	
 	<!-- 도서관 정보  -->
@@ -50,7 +59,35 @@
 			<if test="storeId != null and storeId != ''">
 				AND LIB_MANAGE_CODE IN (SELECT LIB_MANAGE_CODE FROM DLOAN_LIB_ORDER_CONF_TBL WHERE STORE_ID = #{storeId}) 
 			</if>
-	</select> 
+	</select>
+
+	<!-- 도서관 정보(신청제한 적용)  -->
+	<select id="selectLibraryLimit" resultType="camelMap">
+		SELECT
+			LIB.*
+		FROM
+			(SELECT
+				 LIB_MANAGE_CODE AS CODE,
+				 LIB_NAME AS VALUE,
+				LIB_PHONE,
+				LIB_ID,
+				PASSWORD,
+				HANDPHONE,
+				LIB_SORT_ORDER AS NUM,
+				NVL((SELECT LIMIT_YN FROM DLOAN_LIMIT_TBL B WHERE A.LIB_MANAGE_CODE = B.LIB_MANAGE_CODE), 'N') AS LIMIT_YN,
+				NVL((SELECT LIST_YN FROM DLOAN_LIMIT_TBL B WHERE A.LIB_MANAGE_CODE = B.LIB_MANAGE_CODE), 'N') AS LIST_YN,
+				(SELECT LIMIT_DATE_1 FROM DLOAN_LIMIT_TBL B WHERE A.LIB_MANAGE_CODE = B.LIB_MANAGE_CODE) AS LIMIT_DATE_1,
+				(SELECT LIMIT_DATE_2 FROM DLOAN_LIMIT_TBL B WHERE A.LIB_MANAGE_CODE = B.LIB_MANAGE_CODE) AS LIMIT_DATE_2
+			 FROM DLOAN_LIB_TBL A
+			 WHERE LIB_MANAGE_CODE IS NOT NULL) LIB
+		WHERE
+			LIMIT_YN = 'N' OR (LIMIT_YN = 'Y' AND LIST_YN = 'N')
+		   OR (
+					LIMIT_YN = 'Y' AND LIST_YN = 'Y'
+				AND (NVL(TRUNC(LIMIT_DATE_1), SYSDATE - 1) &gt; SYSDATE
+				OR NVL(TRUNC(LIMIT_DATE_2) + 0.99999, SYSDATE + 1) &lt; SYSDATE)
+			)
+	</select>
 	
 	<!-- 
 		SMS 프로시져 호출

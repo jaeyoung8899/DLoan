@@ -9,6 +9,8 @@
 				<c:if test="${sessionScope.LIB_MNG_CD eq null}">
 				<h3><a href="${ctx }/lib/envset/libMng"       <c:if test="${requestScope['javax.servlet.forward.request_uri'] eq '/lib/envset/libMng'      }">class="tab_on"</c:if>>도서관관리</a></h3>
 				<h3><a href="${ctx }/lib/envset/storeMng"     <c:if test="${requestScope['javax.servlet.forward.request_uri'] eq '/lib/envset/storeMng'    }">class="tab_on"</c:if>>서점관리</a></h3>
+<%--				<h3><a href="${ctx }/lib/envset/libReqMng"    <c:if test="${requestScope['javax.servlet.forward.request_uri'] eq '/lib/envset/libReqMng'   }">class="tab_on"</c:if>>도서관신청관리</a></h3>--%>
+				<h3><a href="${ctx }/lib/envset/storeReqMng"  <c:if test="${requestScope['javax.servlet.forward.request_uri'] eq '/lib/envset/storeReqMng' }">class="tab_on"</c:if>>서점신청관리</a></h3>
 				<h3><a href="${ctx }/lib/envset/confMng"      <c:if test="${requestScope['javax.servlet.forward.request_uri'] eq '/lib/envset/confMng'     }">class="tab_on"</c:if>>기타설정관리</a></h3>
 				</c:if>
 			</div>

@@ -14,108 +14,66 @@
 		<section class="content_main">
 			<img src="<c:url value="/resources/store/images/bookstore-box-subtitle.png" />" alt="" class="h2_square">
 			<h2 class="h2">신청승인</h2>
-			<%--<form class="form-horizontal" name="requestInfoForm" id="requestInfoForm">
+			<form class="form-horizontal" name="requestInfoForm" id="requestInfoForm">
 				<input type="hidden"  id="sortCol" name="sortCol" value="${sortCol }" />
 				<input type="hidden"  id="order" name="order"   value="${order }" />
 				<input type="hidden"  id="start"  name="start" value="${start}" />
 				<input type="hidden"  name="display" value="10" />
 				<section class="search_form_01">
-					<label for="selStatus" class="first_label">신청진행상태</label>
-					<select class="select_140" id="selStatus" name="reqStatus">
-						<option value="" <c:if test="${reqStatus eq ''}">selected="selected"</c:if>>전체</option>
-						<option value="U01" <c:if test="${reqStatus eq 'U01'}">selected="selected"</c:if>>신청중</option>
-						<option value="S02" <c:if test="${reqStatus eq 'S02'}">selected="selected"</c:if>>서점신청거절</option>
-						<option value="S03" <c:if test="${reqStatus eq 'S03'}">selected="selected"</c:if>>도서관확인요청</option>
-						<option value="L01" <c:if test="${reqStatus eq 'L01'}">selected="selected"</c:if>>도서관승인</option>
-						<option value="L02" <c:if test="${reqStatus eq 'L02'}">selected="selected"</c:if>>도서관신청거절</option>
-						<option value="S04" <c:if test="${reqStatus eq 'S04'}">selected="selected"</c:if>>도서준비</option>
-						<option value="S05" <c:if test="${reqStatus eq 'S05'}">selected="selected"</c:if>>대출대기</option>
-						<option value="S06" <c:if test="${reqStatus eq 'S06'}">selected="selected"</c:if>>대출</option>
-						<option value="S07" <c:if test="${reqStatus eq 'S07'}">selected="selected"</c:if>>반납</option>
-						<option value="U02" <c:if test="${reqStatus eq 'U02'}">selected="selected"</c:if>>신청취소</option>
-						<option value="S08" <c:if test="${reqStatus eq 'S08'}">selected="selected"</c:if>>미대출취소</option>
-						<option value="S09" <c:if test="${reqStatus eq 'S09'}">selected="selected"</c:if>>환불불가</option>
-					</select>
-					<label for="from_reqDate">신청일</label>
-					<input type="text" class="input_120" id="from_reqDate" name="from_reqDate" title="신청시작일" value="${from_reqDate }" rules="date">
-					-
-					<input type="text" class="input_120" id="to_reqDate" name="to_reqDate" title="신청종료일" value="${to_reqDate }"  rules="date">
-					<label for="userNo">대출자번호</label>
-					<input type="text" class="input_120" id="userNo" name="userNo" value="${userNo }"><br>
-					<label for="title" class="first_label">서명</label>
-					&lt;%&ndash; <input type="text" class="input_350" id="title" name="title" value="${title}"> &ndash;%&gt;
-					&lt;%&ndash; 2019 간담회 기능개선 &ndash;%&gt;
-					<input type="text" class="input_200" id="title" name="title" value="${title}">
-					<label for="author">저자</label>
-					<input type="text" class="input_120" id="author" name="author" value="${author }">
-					<label for="publisher">출판사</label>
-					<input type="text" class="input_120" id="publisher" name="publisher"  value="${publisher }">
-					<label for="isbn">ISBN</label>
-					<input type="text" class="input_160" id="isbn" name="isbn" value="${isbn}">
+					<div class="search_form_field">
+						<label for="selStatus" class="search_form_label">신청진행상태</label>
+						<select class="select_140" id="selStatus" name="reqStatus">
+							<option value="" <c:if test="${reqStatus eq ''}">selected="selected"</c:if>>전체</option>
+							<option value="U01" <c:if test="${reqStatus eq 'U01'}">selected="selected"</c:if>>신청중</option>
+							<option value="S02" <c:if test="${reqStatus eq 'S02'}">selected="selected"</c:if>>서점신청거절</option>
+							<option value="S03" <c:if test="${reqStatus eq 'S03'}">selected="selected"</c:if>>도서관확인요청</option>
+							<option value="L01" <c:if test="${reqStatus eq 'L01'}">selected="selected"</c:if>>도서관승인</option>
+							<option value="L02" <c:if test="${reqStatus eq 'L02'}">selected="selected"</c:if>>도서관신청거절</option>
+							<option value="S04" <c:if test="${reqStatus eq 'S04'}">selected="selected"</c:if>>도서준비</option>
+							<option value="S05" <c:if test="${reqStatus eq 'S05'}">selected="selected"</c:if>>구입대기</option>
+							<option value="S06" <c:if test="${reqStatus eq 'S06'}">selected="selected"</c:if>>구입</option>
+							<option value="S07" <c:if test="${reqStatus eq 'S07'}">selected="selected"</c:if>>반환</option>
+							<option value="U02" <c:if test="${reqStatus eq 'U02'}">selected="selected"</c:if>>신청취소</option>
+							<option value="S08" <c:if test="${reqStatus eq 'S08'}">selected="selected"</c:if>>미구입취소</option>
+							<option value="S09" <c:if test="${reqStatus eq 'S09'}">selected="selected"</c:if>>미반환취소</option>
+						</select>
+					</div>
+					<div class="search_form_field">
+						<label for="from_reqDate" class="search_form_label">신청일</label>
+						<input type="text" class="input_100" id="from_reqDate" name="from_reqDate" title="신청시작일" value="${from_reqDate }" rules="date">
+						-
+						<input type="text" class="input_100" id="to_reqDate" name="to_reqDate" title="신청종료일" value="${to_reqDate }"  rules="date">
+					</div>
+					<div class="search_form_field">
+						<label for="userNo" class="search_form_label">대출자번호</label>
+						<input type="text" class="input_120" id="userNo" name="userNo" value="${userNo }"><br>
+					</div>
+					<div class="search_form_field">
+						<label for="title" class="search_form_label">서명</label>
+						<input type="text" class="input_200" id="title" name="title" value="${title}">
+					</div>
+					<div class="search_form_field">
+						<label for="author" class="search_form_label">저자</label>
+						<input type="text" class="input_120" id="author" name="author" value="${author }">
+					</div>
+					<div class="search_form_field">
+						<label for="publisher" class="search_form_label">출판사</label>
+						<input type="text" class="input_120" id="publisher" name="publisher"  value="${publisher }">
+					</div>
+					<div class="search_form_field">
+						<label for="isbn" class="search_form_label">ISBN</label>
+						<input type="text" class="input_160" id="isbn" name="isbn" value="${isbn}">
+					</div>
+					<div class="search_form_field">
+						<label for="name" class="search_form_label">구입자명</label>
+						<input type="text" class="input_120" id="name" name="name" value="${name}">
+					</div>
 				</section>
 				<div class="btn_wrap">
 					<input type="button" class="btn_search" value="검색" id="btnSearch">
 					<input type="button" class="btn_search"  id="btnClear" value="초기화">
 				</div>
-			</form>--%>
-			<input type="hidden"  id="sortCol" name="sortCol" value="${sortCol }" />
-			<input type="hidden"  id="order" name="order"   value="${order }" />
-			<input type="hidden"  id="start"  name="start" value="${start}" />
-			<input type="hidden"  name="display" value="10" />
-			<section class="search_form_01">
-				<div class="search_form_field">
-					<label for="selStatus" class="search_form_label">신청진행상태</label>
-					<select class="select_140" id="selStatus" name="reqStatus">
-						<option value="" <c:if test="${reqStatus eq ''}">selected="selected"</c:if>>전체</option>
-						<option value="U01" <c:if test="${reqStatus eq 'U01'}">selected="selected"</c:if>>신청중</option>
-						<option value="S02" <c:if test="${reqStatus eq 'S02'}">selected="selected"</c:if>>서점신청거절</option>
-						<option value="S03" <c:if test="${reqStatus eq 'S03'}">selected="selected"</c:if>>도서관확인요청</option>
-						<option value="L01" <c:if test="${reqStatus eq 'L01'}">selected="selected"</c:if>>도서관승인</option>
-						<option value="L02" <c:if test="${reqStatus eq 'L02'}">selected="selected"</c:if>>도서관신청거절</option>
-						<option value="S04" <c:if test="${reqStatus eq 'S04'}">selected="selected"</c:if>>도서준비</option>
-						<option value="S05" <c:if test="${reqStatus eq 'S05'}">selected="selected"</c:if>>구입대기</option>
-						<option value="S06" <c:if test="${reqStatus eq 'S06'}">selected="selected"</c:if>>구입</option>
-						<option value="S07" <c:if test="${reqStatus eq 'S07'}">selected="selected"</c:if>>반환</option>
-						<option value="U02" <c:if test="${reqStatus eq 'U02'}">selected="selected"</c:if>>신청취소</option>
-						<option value="S08" <c:if test="${reqStatus eq 'S08'}">selected="selected"</c:if>>미구입취소</option>
-						<option value="S09" <c:if test="${reqStatus eq 'S09'}">selected="selected"</c:if>>미반환취소</option>
-					</select>
-				</div>
-				<div class="search_form_field">
-					<label for="from_reqDate" class="search_form_label">신청일</label>
-					<input type="text" class="input_100" id="from_reqDate" name="from_reqDate" title="신청시작일" value="${from_reqDate }" rules="date">
-					-
-					<input type="text" class="input_100" id="to_reqDate" name="to_reqDate" title="신청종료일" value="${to_reqDate }"  rules="date">
-				</div>
-				<div class="search_form_field">
-					<label for="userNo" class="search_form_label">대출자번호</label>
-					<input type="text" class="input_120" id="userNo" name="userNo" value="${userNo }"><br>
-				</div>
-				<div class="search_form_field">
-					<label for="title" class="search_form_label">서명</label>
-					<input type="text" class="input_200" id="title" name="title" value="${title}">
-				</div>
-				<div class="search_form_field">
-					<label for="author" class="search_form_label">저자</label>
-					<input type="text" class="input_120" id="author" name="author" value="${author }">
-				</div>
-				<div class="search_form_field">
-					<label for="publisher" class="search_form_label">출판사</label>
-					<input type="text" class="input_120" id="publisher" name="publisher"  value="${publisher }">
-				</div>
-				<div class="search_form_field">
-					<label for="isbn" class="search_form_label">ISBN</label>
-					<input type="text" class="input_160" id="isbn" name="isbn" value="${isbn}">
-				</div>
-				<div class="search_form_field">
-					<label for="name" class="search_form_label">구입자명</label>
-					<input type="text" class="input_120" id="name" name="name" value="${name}">
-				</div>
-			</section>
-			<div class="btn_wrap">
-				<input type="button" class="btn_search" value="검색" id="btnSearch">
-				<input type="button" class="btn_search"  id="btnClear" value="초기화">
-			</div>
+			</form>
 			<div class="result_list">
 				<div class="result_list_wrapper">
 					<table class="result_table" id="requestInfo" style="width:1550px;">

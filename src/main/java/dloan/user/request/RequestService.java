@@ -81,7 +81,6 @@ public class RequestService {
 			return retMap;
 		}
 		Map<String,Object> configMap = dLoanEnvService.getConfTblMap();
-		System.out.println(configMap.get("STORE_PUB_LIMIT_YEAR"));
 		storeRequestPubDatelimit = Integer.parseInt(configMap.get("STORE_PUB_LIMIT_YEAR").toString());
 
 		/**********************************************************
@@ -90,13 +89,23 @@ public class RequestService {
 		params.put("userNo", SessionUtils.getUserNo());
 		params.put("name", SessionUtils.getUserNm());
 		
-		Map<String, Object> tmpMap = null;
+		Map<String, Object> tmpMap = new HashMap<>();
 		
 		String   fullIsbn      = params.get("isbn");
 		String[] arIsbn        = fullIsbn.split(" ");
 		String   title         = params.get("title");
+		String   storeId       = params.get("storeId");
 		String   libManageCode = "";
 		String   libName       = "";
+		String   limitDateReason = "";
+
+		// 1.0 : 서점별 신청제한 기능
+		tmpMap.put("storeId", storeId);
+		limitDateReason = (String) this.commonDao.selectOne(USER_SPACE.concat("getLimitDateReason"), tmpMap);
+		if (!StringUtils.isEmpty(limitDateReason)) {
+			return ValidUtils.resultErrorMap(limitDateReason);
+		}
+
 		
 		// 1.1 : 연락처 일치여부 확인
 		if (!params.get("phone").equals(params.get("newPhone"))) {
@@ -971,7 +980,7 @@ public class RequestService {
 	 * 대출가능 도서
 	 * 
 	 * @param params {isbn, libManageCode}
-	 * @param isbn의 경우 89123456 978123456456 의 경우 공백을 기준으로 or 검색
+	 * @param isbn 경우 89123456 978123456456 의 경우 공백을 기준으로 or 검색
 	 * @return
 	 * RETURN 'X(타관책)';
 	 * RETURN 'X(예약중)';

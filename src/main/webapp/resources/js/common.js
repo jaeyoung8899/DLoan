@@ -625,6 +625,8 @@ var commSubmit = function (objForm) {
 
 	// 기본 post로 넘김.
 	this.submit = function submit() {
+		console.log($("#"+this.formId))
+		console.log($("#"+this.formId)[0])
 		var sForm    = $("#"+this.formId)[0];
 		sForm.action = this.url;
 		sForm.method = "POST";

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration scan="true" scanPeriod="30 seconds">
+
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="[%d] [%-5level] [%logger{36}:%line]- %msg%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <logger name="dloan" additivity="false">
+            <level value="DEBUG"/>
+            <appender-ref ref="console"/>
+        </logger>
+
+        <logger name="ecobooks_cms" additivity="false">
+            <level value="DEBUG"/>
+            <appender-ref ref="console"/>
+        </logger>
+
+        <logger name="common.dao.CommonDao" additivity="false">
+            <level value="ERROR"/>
+            <appender-ref ref="console"/>
+        </logger>
+
+        <logger name="jdbc.sqlonly" additivity="false">
+            <level value="ERROR"/>
+            <appender-ref ref="console"/>
+        </logger>
+
+        <logger name="org.springframework.web" additivity="false">
+            <level value="INFO" />
+            <appender-ref ref="console" />
+        </logger>
+
+        <logger name="org.apache.tomcat.jdbc.pool.ConnectionPool" level="DEBUG" />
+        <logger name="org.springframework" level="ERROR" />
+        <logger name="org.springframework.web.servlet.DispatcherServlet" level="ERROR"/>
+        <logger name="jdbc.sqltiming" level="ERROR"/>
+        <logger name="jdbc.audit" level="ERROR"/>
+        <logger name="jdbc.resultset" level="ERROR"/>
+        <logger name="jdbc.resultsettable" level="DEBUG"/>
+        <logger name="jdbc.connection" level="ERROR"/>
+        <logger name="org.mybatis.spring.transaction.SpringManagedTransaction" level="ERROR"/>
+        <logger name="org.mybatis.spring.SqlSessionUtils" level="ERROR"/>
+        <logger name="org.springframework.jdbc.datasource.DataSourceUtils" level="ERROR"/>
+
+        <root level="DEBUG">
+            <priority value="off"/>
+            <appender-ref ref="console"/>
+        </root>
+    </Loggers>
+
+</configuration>

@@ -131,6 +131,7 @@ var storeRequest = {
 
 		var form = new commSubmit('requestInfoForm');
 		form.setUrl( _ctx + "/store/storeRequestInfo");
+		console.log(form);
 		form.submit();
 	},
 	

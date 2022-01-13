@@ -1,10 +1,12 @@
 package dloan.common.handler;
 
 import java.util.Date;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -15,12 +17,9 @@ import dloan.common.util.SessionUtils;
  */
 public class SessionInterceptor extends HandlerInterceptorAdapter {
 
-	/**
-	 * 도서관 세션유지시간 (초단위)
-	 */
-	@Value("#{conf['lib_session_timeout']}")
-	private int libSessionTimeout;
-	
+	@Autowired
+	private DLoanEnvService dLoanEnvService;
+
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 	throws Exception {
@@ -43,9 +42,14 @@ public class SessionInterceptor extends HandlerInterceptorAdapter {
 					return false;
 				}
 			}
-			
+
+			Map<String,Object> configMap = dLoanEnvService.getConfTblMap();
+
+			//세션타임 설정 기본 30분
+			long libSessionTimeout = configMap.get("LIB_SESSION_TIMEOUT") != null ? Long.parseLong(configMap.get("LIB_SESSION_TIMEOUT").toString()) : 30L;
+
 			// 도서관 세션유지시간 초기화
-			SessionUtils.setLibExfTime(new Date(new Date().getTime() + (this.libSessionTimeout*1000)));
+			SessionUtils.setLibExfTime(new Date(new Date().getTime() + (libSessionTimeout * 60 *1000)));
 			
 		} else if (uri.startsWith("/store")) {
 			// ----------------------------------------------------------------------------------------------------

@@ -188,7 +188,7 @@
 								</c:when>
 								<c:otherwise>
 									<tr>
-										<td colspan="18">조회된 결과가 없습니다.</td>
+										<td colspan="21">조회된 결과가 없습니다.</td>
 									</tr>
 								</c:otherwise>
 							</c:choose>

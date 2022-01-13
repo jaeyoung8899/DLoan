@@ -75,6 +75,7 @@ var login = {
 
 		//맥주소 체크
 		var macUseYn = comm.getViewOptionData_value('003','ALL');
+		console.log(macUseYn);
 		if(macUseYn !=='undefined' && macUseYn !== undefined && macUseYn !== '' && macUseYn === 'Y') {
 			login.getMac(login.loginProc);
 		}else{

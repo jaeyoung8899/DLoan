@@ -640,4 +640,23 @@
 		WHERE
 			ROWNUM = 1
 	</select>
+
+	<select id="getLimitDateReason" parameterType="map"  resultType="String">
+		SELECT
+		LIMIT_REASON
+		FROM
+		DLOAN_LIMIT_TBL
+		WHERE
+		<if test="libManageCode != null">
+			LIB_MANAGE_CODE = #{libManageCode}
+		</if>
+		<if test="storeId != null">
+			STORE_ID = #{storeId}
+		</if>
+		AND LIMIT_YN = 'Y'
+		AND NVL(TRUNC(LIMIT_DATE_1), SYSDATE - 1) &lt; SYSDATE
+		AND NVL(TRUNC(LIMIT_DATE_2) + 0.99999, SYSDATE + 1) &gt; SYSDATE
+		AND ROWNUM = 1
+	</select>
+
 </mapper>
