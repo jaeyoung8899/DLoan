@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="library.store.reqmanage">
+
+	<select id="selectStore" parameterType="map" resultType="camelMap">
+		SELECT
+			STORE.STORE_ID,
+			STORE.STORE_NAME,
+			NVL(LIMIT.LIMIT_YN, 'N') AS LIMIT_YN,
+			NVL(LIMIT.LIST_YN, 'N') AS LIST_YN,
+			TO_CHAR(LIMIT.LIMIT_DATE_1,'yyyy-MM-dd') AS LIMIT_DATE_1,
+			TO_CHAR(LIMIT.LIMIT_DATE_2,'yyyy-MM-dd') AS LIMIT_DATE_2,
+			LIMIT.LIMIT_REASON
+		FROM
+			DLOAN_STORE_TBL STORE, DLOAN_LIMIT_TBL LIMIT
+		WHERE
+			STORE.STORE_ID IS NOT NULL
+			AND STORE.STORE_ID = LIMIT.STORE_ID(+)
+	</select>
+	
+	<select id="updateStoreLimit" parameterType="map" resultType="camelMap">
+		MERGE INTO
+			DLOAN_LIMIT_TBL
+		USING DUAL ON (STORE_ID = #{storeId})
+		WHEN MATCHED THEN
+			UPDATE
+			SET
+				LIMIT_YN = #{limitYN},
+				LIST_YN = #{listYN},
+				LIMIT_DATE_1 = #{limitDate1},
+				LIMIT_DATE_2 = #{limitDate2},
+				LIMIT_REASON = #{limitReason}
+		WHEN NOT MATCHED THEN
+			INSERT
+				(REC_KEY, STORE_ID, LIMIT_YN, LIST_YN, LIMIT_DATE_1, LIMIT_DATE_2, LIMIT_REASON)
+			VALUES
+				(DLOAN_SEQ.NEXTVAL,
+				#{storeId},
+				#{limitYN},
+				#{listYN},
+				#{limitDate1},
+				#{limitDate2},
+				#{limitReason})
+	</select>
+</mapper>

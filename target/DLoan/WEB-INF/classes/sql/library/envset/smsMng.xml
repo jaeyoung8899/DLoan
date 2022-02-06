@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="library.smsmng">
+
+	<select id="selectSmsMng" parameterType="map" resultType="camelMap">
+		SELECT 
+		       ROW_NUMBER() OVER(ORDER BY REC_KEY) RNUM,
+		       REC_KEY,
+			   NAME,
+			   CONTENTS,
+			   AUTO_YN
+		  FROM DLOAN_SMS_CONF_TBL
+		 ORDER BY AUTO_YN DESC, REC_KEY
+	</select>
+	
+	<update id="saveSmsMng" parameterType="Map" >
+		MERGE INTO DLOAN_SMS_CONF_TBL
+           USING DUAL
+              ON  (REC_KEY = #{recKey} )
+            WHEN MATCHED THEN
+                  UPDATE 
+                     SET NAME           = DECODE(AUTO_YN, 'Y', NAME, #{name}),
+                         CONTENTS       = #{contents},
+                         UPDATE_USER_ID = #{userId},
+                         UPDATE_DATE    = SYSDATE
+            WHEN NOT MATCHED THEN
+                   INSERT (REC_KEY,
+                           NAME,
+                           CONTENTS,
+                           CARETE_USER_ID,
+                           CARETE_DATE,
+                           UPDATE_USER_ID,
+                           UPDATE_DATE )
+                   VALUES (DLOAN_SEQ.NEXTVAL,
+                           #{name},
+                           #{contents},
+                           #{userId},
+                           SYSDATE,
+                           #{userId},
+                           SYSDATE)
+	</update>
+	
+	<delete id="deleteSmsMng">
+		DELETE FROM DLOAN_SMS_CONF_TBL
+		 WHERE REC_KEY = #{recKey}
+	</delete>
+
+</mapper>

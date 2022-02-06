@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="user.login">
+	
+	<select id="getEncryptYn" resultType="String">
+		SELECT USE_YN 
+		  FROM CO_UTIL_LOCK_TBL 
+		 WHERE UTIL_CODE = 'VISITORPWENCRYPTION'
+	</select>
+	
+	<select id="getUserInfo" parameterType="String" resultType="camelMap">
+		SELECT USER_NO, 
+		       USER_ID,
+		       PASSWORD,
+		       NAME,
+		       HANDPHONE
+		  FROM CO_LOAN_USER_TBL
+		 WHERE MEMBER_CLASS = 0
+		  AND USER_ID = #{userId}
+	</select>
+	
+	<select id="getUserInfoUserNo" parameterType="String" resultType="camelMap">
+		SELECT USER_NO, 
+		       USER_ID,
+		       PASSWORD,
+		       NAME,
+		       HANDPHONE
+		  FROM CO_LOAN_USER_TBL
+		 WHERE USER_NO = #{userNo}
+	</select>
+
+</mapper>
