@@ -46,5 +46,25 @@
                            SYSDATE)
 	</update>
 	
+	<!-- 도서관  정보 -->
+	<select id="selectNonLibraryOrderInfo" parameterType="Map" resultType="CamelMap">
+		SELECT LIB_MANAGE_CODE
+			 , LIB_NAME
+		FROM DLOAN_LIB_TBL
+		WHERE LIB_MANAGE_CODE NOT IN
+			(
+				SELECT LIB.LIB_MANAGE_CODE
+				FROM DLOAN_LIB_ORDER_CONF_TBL ODR
+				   , DLOAN_LIB_TBL LIB
+				WHERE ODR.LIB_MANAGE_CODE = LIB.LIB_MANAGE_CODE
+				  AND ODR.STORE_ID = #{storeId}
+			)
+		  AND LIB_MANAGE_CODE IS NOT NULL
+
+	</select>
+	
+	<update id="deleteLibOrdered" parameterType="String" >
+		DELETE FROM DLOAN_LIB_ORDER_CONF_TBL WHERE STORE_ID = #{storeId}
+	</update>
 
 </mapper>

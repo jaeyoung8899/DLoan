@@ -47,6 +47,7 @@ public class LibraryOrderedService {
 		}
 		
 		retMap.put("storeList", commonDao.selectList(NAME_SPACE.concat("selectLibraryOrderInfo"), params));
+		retMap.put("storeNonList", commonDao.selectList(NAME_SPACE.concat("selectNonLibraryOrderInfo"), params));
 		retMap.putAll(ValidUtils.resultSuccessMap());
 		
 		return retMap;
@@ -61,6 +62,8 @@ public class LibraryOrderedService {
 	public void saveLibOrdered (List<String> lib, List<String> order, String storeId) {
 		
 		Map<String, Object> params = null;
+		commonDao.delete(NAME_SPACE.concat("deleteLibOrdered"), storeId);
+		
 		for (int i = 0; i < lib.size(); i++) {
 			params = new HashMap<String, Object>();
 			params.put("storeId",       storeId);

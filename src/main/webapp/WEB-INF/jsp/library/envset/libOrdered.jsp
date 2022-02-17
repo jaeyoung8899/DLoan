@@ -50,7 +50,11 @@
 				<input type="hidden" id="storeId">
 				<div style="position:relative; top:-30px; display:inline-block">
 					<h4 style="margin-left:20px"><span class="red">● </span> <span id="libTitle"></span></h4>
-					<ul id="sortable"></ul>
+					<ul id="sortable" class="sortable"></ul>
+					<div style="position:relative;">
+						<h4 style="margin-left:20px"><span class="red">●</span> <span id="libTitle2">미배분도서관</span></h4>
+						<ul id="nonSortable"  class="sortable"></ul>
+					</div>
 				</div>
 				<div class="btn_wrap" style="width: 60%">
 					<input type="button" class="btn_search" value="저장" id="btnSave">

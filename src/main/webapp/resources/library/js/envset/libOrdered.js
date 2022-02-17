@@ -9,9 +9,29 @@ var libOrdered = {
 		
 	init : function () {
 		this.events();
-		
-		$("#sortable").sortable();
-		$("#sortable").disableSelection();
+		$("#sortable").sortable({
+			connectWith: '#nonSortable',
+			receive: function (event, ui){
+				let order = $(this).sortable('toArray');
+				console.log("receive:"+order);
+			},
+			remove: function (event, ui) {
+				let order = $(this).sortable('toArray');
+				console.log('receive:'+order);
+			}
+		}).disableSelection();
+
+		$("#nonSortable").sortable({
+			connectWith: '#sortable',
+			receive: function (event, ui){
+				let order = $(this).sortable('toArray');
+				console.log("receive:"+order);
+			},
+			remove: function (event, ui) {
+				let order = $(this).sortable('toArray');
+				console.log('receive:'+order);
+			}
+		}).disableSelection();
 		
 		if ($('#store tbody > tr').length == 0) {
 			alert('도서관 배분관리 기초데이터를 확인해주세요.');
@@ -51,6 +71,7 @@ var libOrdered = {
 			$.commAjax (option, function (result) {
 				if (result.resultCode == "Y") {
 					libOrdered.libDraw(result.storeList);
+					libOrdered.nonLibDraw(result.storeNonList);
 				} else {
 					alert(result.resultMessage);
 				}
@@ -87,6 +108,17 @@ var libOrdered = {
 		
 		$.each(libList, function(i, el) {
 			$('#sortable').append(
+				'<li class="ui-state-default" id="'+el.libManageCode+'"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>'+el.libName+" ("+el.libManageCode+")"+'</li>'
+			)
+		});
+	},
+	
+	nonLibDraw : function(libList) {
+
+		$('#nonSortable').empty();
+
+		$.each(libList, function(i, el) {
+			$('#nonSortable').append(
 				'<li class="ui-state-default" id="'+el.libManageCode+'"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>'+el.libName+" ("+el.libManageCode+")"+'</li>'
 			)
 		});
